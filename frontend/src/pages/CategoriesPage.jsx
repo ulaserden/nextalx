@@ -1,6 +1,122 @@
+import { useEffect, useState } from "react";
+
+import CategoriesTable
+    from "../features/categories/CategoriesTable";
+
+import {
+    getCategories
+} from "../services/categoryService";
+
 function CategoriesPage() {
+
+    const [categories, setCategories] =
+        useState([]);
+
+    const [loading, setLoading] =
+        useState(true);
+
+    const [page, setPage] =
+        useState(0);
+
+    const [totalPages, setTotalPages] =
+        useState(0);
+
+    useEffect(() => {
+
+        const fetchCategories =
+            async () => {
+
+                try {
+
+                    const response =
+                        await getCategories(
+                            page,
+                            10
+                        );
+
+                    setCategories(
+                        response.content
+                    );
+
+                    setTotalPages(
+                        response.totalPages
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+                } finally {
+
+                    setLoading(
+                        false
+                    );
+                }
+            };
+
+        fetchCategories();
+
+    }, [page]);
+
+    if (loading) {
+        return <h2>Loading...</h2>;
+    }
+
     return (
-        <h1>Categories</h1>
+        <div>
+
+            <h1>
+                Categories
+            </h1>
+
+            <CategoriesTable
+                categories={
+                    categories
+                }
+            />
+
+            <div
+                style={{
+                    marginTop: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px"
+                }}
+            >
+                <button
+                    disabled={
+                        page === 0
+                    }
+                    onClick={() =>
+                        setPage(
+                            page - 1
+                        )
+                    }
+                >
+                    Previous
+                </button>
+
+                <span>
+                    Page {page + 1} / {totalPages}
+                </span>
+
+                <button
+                    disabled={
+                        page + 1 >= totalPages
+                    }
+                    onClick={() =>
+                        setPage(
+                            page + 1
+                        )
+                    }
+                >
+                    Next
+                </button>
+            </div>
+
+        </div>
     );
 }
 
