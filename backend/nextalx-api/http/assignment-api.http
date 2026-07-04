@@ -1,0 +1,20 @@
+### Get Assignments
+GET http://localhost:8080/api/v1/assignments
+
+###
+
+### Create Assignment
+POST http://localhost:8080/api/v1/assignments
+Content-Type: application/json
+
+{
+  "employeeId": 1,
+  "assetId": 1,
+  "assignedDate": "2026-07-04",
+  "note": "Primary development laptop"
+}
+
+###
+
+### Return Asset
+POST http://localhost:8080/api/v1/assignments/1/return

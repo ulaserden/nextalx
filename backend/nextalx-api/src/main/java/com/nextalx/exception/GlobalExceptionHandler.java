@@ -164,4 +164,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(response);
     }
+    @ExceptionHandler(AssignmentNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleAssignmentNotFound(
+            AssignmentNotFoundException ex,
+            HttpServletRequest request
+    ) {
+
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
 }

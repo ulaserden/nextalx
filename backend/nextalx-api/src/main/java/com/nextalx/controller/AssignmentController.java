@@ -30,4 +30,13 @@ public class AssignmentController {
                 request
         );
     }
+
+    @PostMapping("/{id}/return")
+    public AssignmentResponse returnAsset(
+            @PathVariable Long id
+    ) {
+        return assignmentService.returnAsset(
+                id
+        );
+    }
 }

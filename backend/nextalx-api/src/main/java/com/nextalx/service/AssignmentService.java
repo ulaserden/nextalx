@@ -12,4 +12,8 @@ public interface AssignmentService {
     AssignmentResponse createAssignment(
             CreateAssignmentRequest request
     );
+
+    AssignmentResponse returnAsset(
+            Long assignmentId
+    );
 }
