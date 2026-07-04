@@ -2,12 +2,14 @@ package com.nextalx.service;
 
 import com.nextalx.dto.request.CreateAssetCategoryRequest;
 import com.nextalx.dto.response.AssetCategoryResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface AssetCategoryService {
 
-    List<AssetCategoryResponse> getAllAssetCategories();
+    Page<AssetCategoryResponse> getAllAssetCategories(
+            int page,
+            int size
+    );
 
     AssetCategoryResponse createAssetCategory(
             CreateAssetCategoryRequest request

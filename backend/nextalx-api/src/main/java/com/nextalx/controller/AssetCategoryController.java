@@ -5,9 +5,8 @@ import com.nextalx.dto.response.AssetCategoryResponse;
 import com.nextalx.service.AssetCategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/asset-categories")
@@ -17,16 +16,35 @@ public class AssetCategoryController {
     private final AssetCategoryService assetCategoryService;
 
     @GetMapping
-    public List<AssetCategoryResponse> getAllAssetCategories() {
-        return assetCategoryService.getAllAssetCategories();
+    public Page<AssetCategoryResponse> getAllAssetCategories(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+
+    ) {
+
+        return assetCategoryService.getAllAssetCategories(
+                page,
+                size
+        );
     }
 
     @PostMapping
     public AssetCategoryResponse createAssetCategory(
-            @Valid @RequestBody
+            @Valid
+            @RequestBody
             CreateAssetCategoryRequest request
     ) {
-        return assetCategoryService
-                .createAssetCategory(request);
+
+        return assetCategoryService.createAssetCategory(
+                request
+        );
     }
 }

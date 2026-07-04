@@ -8,9 +8,9 @@ import com.nextalx.mapper.AssetCategoryMapper;
 import com.nextalx.repository.AssetCategoryRepository;
 import com.nextalx.service.AssetCategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,12 +21,20 @@ public class AssetCategoryServiceImpl
     private final AssetCategoryMapper assetCategoryMapper;
 
     @Override
-    public List<AssetCategoryResponse> getAllAssetCategories() {
+    public Page<AssetCategoryResponse> getAllAssetCategories(
+            int page,
+            int size
+    ) {
 
-        return assetCategoryRepository.findAll()
-                .stream()
-                .map(assetCategoryMapper::toResponse)
-                .toList();
+        return assetCategoryRepository.findAll(
+                        PageRequest.of(
+                                page,
+                                size
+                        )
+                )
+                .map(
+                        assetCategoryMapper::toResponse
+                );
     }
 
     @Override
@@ -35,7 +43,8 @@ public class AssetCategoryServiceImpl
     ) {
 
         if (assetCategoryRepository.existsByName(
-                request.getName())) {
+                request.getName()
+        )) {
 
             throw new AssetCategoryAlreadyExistsException(
                     "Asset category already exists."
@@ -43,10 +52,14 @@ public class AssetCategoryServiceImpl
         }
 
         AssetCategory category =
-                assetCategoryMapper.toEntity(request);
+                assetCategoryMapper.toEntity(
+                        request
+                );
 
         AssetCategory savedCategory =
-                assetCategoryRepository.save(category);
+                assetCategoryRepository.save(
+                        category
+                );
 
         return assetCategoryMapper.toResponse(
                 savedCategory

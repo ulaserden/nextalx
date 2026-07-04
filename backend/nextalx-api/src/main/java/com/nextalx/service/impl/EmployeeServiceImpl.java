@@ -11,9 +11,9 @@ import com.nextalx.repository.DepartmentRepository;
 import com.nextalx.repository.EmployeeRepository;
 import com.nextalx.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,11 +60,19 @@ public class EmployeeServiceImpl
     }
 
     @Override
-    public List<EmployeeResponse> getAllEmployees() {
+    public Page<EmployeeResponse> getAllEmployees(
+            int page,
+            int size
+    ) {
 
-        return employeeRepository.findAll()
-                .stream()
-                .map(employeeMapper::toResponse)
-                .toList();
+        return employeeRepository.findAll(
+                        PageRequest.of(
+                                page,
+                                size
+                        )
+                )
+                .map(
+                        employeeMapper::toResponse
+                );
     }
 }

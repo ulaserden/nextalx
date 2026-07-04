@@ -16,14 +16,16 @@ import com.nextalx.repository.AssignmentRepository;
 import com.nextalx.repository.EmployeeRepository;
 import com.nextalx.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AssignmentServiceImpl implements AssignmentService {
+public class AssignmentServiceImpl
+        implements AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
     private final EmployeeRepository employeeRepository;
@@ -31,12 +33,20 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final AssignmentMapper assignmentMapper;
 
     @Override
-    public List<AssignmentResponse> getAllAssignments() {
+    public Page<AssignmentResponse> getAllAssignments(
+            int page,
+            int size
+    ) {
 
-        return assignmentRepository.findAll()
-                .stream()
-                .map(assignmentMapper::toResponse)
-                .toList();
+        return assignmentRepository.findAll(
+                        PageRequest.of(
+                                page,
+                                size
+                        )
+                )
+                .map(
+                        assignmentMapper::toResponse
+                );
     }
 
     @Override
@@ -44,19 +54,23 @@ public class AssignmentServiceImpl implements AssignmentService {
             CreateAssignmentRequest request
     ) {
 
-        Employee employee = employeeRepository.findById(
-                        request.getEmployeeId())
-                .orElseThrow(() ->
-                        new EmployeeNotFoundException(
-                                "Employee not found."
-                        ));
+        Employee employee =
+                employeeRepository.findById(
+                                request.getEmployeeId()
+                        )
+                        .orElseThrow(() ->
+                                new EmployeeNotFoundException(
+                                        "Employee not found."
+                                ));
 
-        Asset asset = assetRepository.findById(
-                        request.getAssetId())
-                .orElseThrow(() ->
-                        new AssetNotFoundException(
-                                "Asset not found."
-                        ));
+        Asset asset =
+                assetRepository.findById(
+                                request.getAssetId()
+                        )
+                        .orElseThrow(() ->
+                                new AssetNotFoundException(
+                                        "Asset not found."
+                                ));
 
         if (assignmentRepository
                 .existsByAssetIdAndReturnedDateIsNull(
@@ -79,7 +93,9 @@ public class AssignmentServiceImpl implements AssignmentService {
                 AssetStatus.ASSIGNED
         );
 
-        assetRepository.save(asset);
+        assetRepository.save(
+                asset
+        );
 
         Assignment savedAssignment =
                 assignmentRepository.save(

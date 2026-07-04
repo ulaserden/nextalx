@@ -2,8 +2,7 @@ package com.nextalx.service;
 
 import com.nextalx.dto.request.CreateEmployeeRequest;
 import com.nextalx.dto.response.EmployeeResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface EmployeeService {
 
@@ -11,6 +10,9 @@ public interface EmployeeService {
             CreateEmployeeRequest request
     );
 
-    List<EmployeeResponse> getAllEmployees();
+    Page<EmployeeResponse> getAllEmployees(
+            int page,
+            int size
+    );
 
 }

@@ -5,9 +5,8 @@ import com.nextalx.dto.response.AssignmentResponse;
 import com.nextalx.service.AssignmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/assignments")
@@ -17,15 +16,33 @@ public class AssignmentController {
     private final AssignmentService assignmentService;
 
     @GetMapping
-    public List<AssignmentResponse> getAllAssignments() {
-        return assignmentService.getAllAssignments();
+    public Page<AssignmentResponse> getAllAssignments(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+
+    ) {
+
+        return assignmentService.getAllAssignments(
+                page,
+                size
+        );
     }
 
     @PostMapping
     public AssignmentResponse createAssignment(
-            @Valid @RequestBody
+            @Valid
+            @RequestBody
             CreateAssignmentRequest request
     ) {
+
         return assignmentService.createAssignment(
                 request
         );
@@ -35,6 +52,7 @@ public class AssignmentController {
     public AssignmentResponse returnAsset(
             @PathVariable Long id
     ) {
+
         return assignmentService.returnAsset(
                 id
         );

@@ -5,9 +5,8 @@ import com.nextalx.dto.response.AssetResponse;
 import com.nextalx.service.AssetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/assets")
@@ -17,8 +16,24 @@ public class AssetController {
     private final AssetService assetService;
 
     @GetMapping
-    public List<AssetResponse> getAllAssets() {
-        return assetService.getAllAssets();
+    public Page<AssetResponse> getAllAssets(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+
+    ) {
+
+        return assetService.getAllAssets(
+                page,
+                size
+        );
     }
 
     @PostMapping
@@ -27,6 +42,9 @@ public class AssetController {
             @RequestBody
             CreateAssetRequest request
     ) {
-        return assetService.createAsset(request);
+
+        return assetService.createAsset(
+                request
+        );
     }
 }

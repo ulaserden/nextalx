@@ -11,9 +11,9 @@ import com.nextalx.repository.AssetCategoryRepository;
 import com.nextalx.repository.AssetRepository;
 import com.nextalx.service.AssetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +24,20 @@ public class AssetServiceImpl implements AssetService {
     private final AssetMapper assetMapper;
 
     @Override
-    public List<AssetResponse> getAllAssets() {
+    public Page<AssetResponse> getAllAssets(
+            int page,
+            int size
+    ) {
 
-        return assetRepository.findAll()
-                .stream()
-                .map(assetMapper::toResponse)
-                .toList();
+        return assetRepository.findAll(
+                        PageRequest.of(
+                                page,
+                                size
+                        )
+                )
+                .map(
+                        assetMapper::toResponse
+                );
     }
 
     @Override
@@ -38,16 +46,18 @@ public class AssetServiceImpl implements AssetService {
     ) {
 
         if (assetRepository.existsByAssetTag(
-                request.getAssetTag())) {
+                request.getAssetTag()
+        )) {
 
             throw new AssetAlreadyExistsException(
                     "Asset tag already exists."
             );
         }
 
-        if (request.getSerialNumber() != null &&
-                assetRepository.existsBySerialNumber(
-                        request.getSerialNumber())) {
+        if (request.getSerialNumber() != null
+                && assetRepository.existsBySerialNumber(
+                request.getSerialNumber()
+        )) {
 
             throw new AssetAlreadyExistsException(
                     "Serial number already exists."
@@ -56,7 +66,8 @@ public class AssetServiceImpl implements AssetService {
 
         AssetCategory category =
                 assetCategoryRepository.findById(
-                                request.getCategoryId())
+                                request.getCategoryId()
+                        )
                         .orElseThrow(() ->
                                 new AssetCategoryNotFoundException(
                                         "Asset category not found."
@@ -69,8 +80,12 @@ public class AssetServiceImpl implements AssetService {
                 );
 
         Asset savedAsset =
-                assetRepository.save(asset);
+                assetRepository.save(
+                        asset
+                );
 
-        return assetMapper.toResponse(savedAsset);
+        return assetMapper.toResponse(
+                savedAsset
+        );
     }
 }

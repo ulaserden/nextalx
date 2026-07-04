@@ -8,35 +8,61 @@ import com.nextalx.mapper.DepartmentMapper;
 import com.nextalx.repository.DepartmentRepository;
 import com.nextalx.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DepartmentServiceImpl implements DepartmentService {
+public class DepartmentServiceImpl
+        implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
 
     @Override
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
+    public Page<DepartmentResponse> getAllDepartments(
+            int page,
+            int size
+    ) {
+
+        return departmentRepository.findAll(
+                        PageRequest.of(
+                                page,
+                                size
+                        )
+                )
+                .map(
+                        departmentMapper::toResponse
+                );
     }
 
     @Override
-    public DepartmentResponse createDepartment(CreateDepartmentRequest request) {
+    public DepartmentResponse createDepartment(
+            CreateDepartmentRequest request
+    ) {
 
-        if (departmentRepository.existsByName(request.getName())) {
+        if (departmentRepository.existsByName(
+                request.getName()
+        )) {
+
             throw new DepartmentAlreadyExistsException(
                     "Department already exists."
             );
         }
 
-        Department department = departmentMapper.toEntity(request);
+        Department department =
+                departmentMapper.toEntity(
+                        request
+                );
 
-        Department savedDepartment = departmentRepository.save(department);
+        Department savedDepartment =
+                departmentRepository.save(
+                        department
+                );
 
-        return departmentMapper.toResponse(savedDepartment);
+        return departmentMapper.toResponse(
+                savedDepartment
+        );
     }
 }

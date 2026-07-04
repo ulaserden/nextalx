@@ -2,14 +2,16 @@ package com.nextalx.service;
 
 import com.nextalx.dto.request.CreateDepartmentRequest;
 import com.nextalx.dto.response.DepartmentResponse;
-import com.nextalx.entity.Department;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface DepartmentService {
 
-    List<Department> getAllDepartments();
+    Page<DepartmentResponse> getAllDepartments(
+            int page,
+            int size
+    );
 
-    DepartmentResponse createDepartment(CreateDepartmentRequest request);
-
+    DepartmentResponse createDepartment(
+            CreateDepartmentRequest request
+    );
 }

@@ -1,5 +1,5 @@
 ### Get Assignments
-GET http://localhost:8080/api/v1/assignments
+GET http://localhost:8080/api/v1/assignments?page=0&size=10
 
 ###
 
