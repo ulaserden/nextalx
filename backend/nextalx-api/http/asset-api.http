@@ -1,0 +1,18 @@
+### Create Asset
+POST http://localhost:8080/api/v1/assets
+Content-Type: application/json
+
+{
+  "assetTag": "NXT-000001",
+  "serialNumber": "PF4AB12345",
+  "brand": "Lenovo",
+  "model": "ThinkPad T14 Gen 5",
+  "purchaseDate": "2026-07-01",
+  "warrantyEndDate": "2029-07-01",
+  "status": "AVAILABLE",
+  "categoryId": 1
+}
+
+###
+
+GET http://localhost:8080/api/v1/assets

@@ -3,6 +3,7 @@ package com.nextalx.service.impl;
 import com.nextalx.dto.request.CreateDepartmentRequest;
 import com.nextalx.dto.response.DepartmentResponse;
 import com.nextalx.entity.Department;
+import com.nextalx.exception.DepartmentAlreadyExistsException;
 import com.nextalx.mapper.DepartmentMapper;
 import com.nextalx.repository.DepartmentRepository;
 import com.nextalx.service.DepartmentService;
@@ -27,7 +28,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     public DepartmentResponse createDepartment(CreateDepartmentRequest request) {
 
         if (departmentRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Department already exists.");
+            throw new DepartmentAlreadyExistsException(
+                    "Department already exists."
+            );
         }
 
         Department department = departmentMapper.toEntity(request);

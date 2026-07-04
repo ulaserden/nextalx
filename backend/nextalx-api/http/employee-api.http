@@ -1,0 +1,17 @@
+### Create Employee
+POST http://localhost:8080/api/v1/employees
+Content-Type: application/json
+
+{
+  "firstName": "Ahmet",
+  "lastName": "Yılmaz",
+  "email": "ahmet@nextalx.com",
+  "phone": "05551234567",
+  "jobTitle": "Backend Developer",
+  "status": "ACTIVE",
+  "departmentId": 1
+}
+
+###
+
+GET http://localhost:8080/api/v1/employees
