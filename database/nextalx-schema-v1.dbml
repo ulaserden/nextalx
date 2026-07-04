@@ -1,0 +1,95 @@
+Project Nextalx {
+  database_type: "PostgreSQL"
+  Note: "Nextalx IT Asset Management System v1.0"
+}
+
+Table departments {
+  id bigint [pk, increment]
+  name varchar(100) [not null, unique]
+  description varchar(255)
+
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table employees {
+  id bigint [pk, increment]
+
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+
+  email varchar(255) [not null, unique]
+  phone varchar(20)
+
+  job_title varchar(100)
+
+  status varchar(20) [not null, note: "ACTIVE / INACTIVE"]
+
+  department_id bigint [not null]
+
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table asset_categories {
+
+  id bigint [pk, increment]
+
+  name varchar(100) [not null, unique]
+
+  description varchar(255)
+
+  created_at timestamp [not null]
+
+  updated_at timestamp [not null]
+}
+
+Table assets {
+
+  id bigint [pk, increment]
+
+  asset_tag varchar(20) [not null, unique]
+
+  serial_number varchar(100) [not null, unique]
+
+  brand varchar(100) [not null]
+
+  model varchar(100) [not null]
+
+  purchase_date date
+
+  warranty_end_date date
+
+  status varchar(30) [not null, note: "AVAILABLE, ASSIGNED, MAINTENANCE, RETIRED, LOST"]
+
+  category_id bigint [not null]
+
+  created_at timestamp [not null]
+
+  updated_at timestamp [not null]
+}
+
+Table assignments {
+
+  id bigint [pk, increment]
+
+  employee_id bigint [not null]
+
+  asset_id bigint [not null]
+
+  assigned_date date [not null]
+
+  returned_date date
+
+  notes text
+
+  created_at timestamp [not null]
+}
+
+Ref: employees.department_id > departments.id
+
+Ref: assets.category_id > asset_categories.id
+
+Ref: assignments.employee_id > employees.id
+
+Ref: assignments.asset_id > assets.id
