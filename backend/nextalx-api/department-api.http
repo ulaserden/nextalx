@@ -1,0 +1,12 @@
+### Create Department
+POST http://localhost:8080/api/v1/departments
+Content-Type: application/json
+
+{
+  "name": "Information Technology",
+  "description": "Responsible for infrastructure and systems."
+}
+
+###
+
+GET http://localhost:8080/api/v1/departments

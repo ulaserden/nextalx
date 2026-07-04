@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: nextalx-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nextalx
+    username: postgres
+    password: postgre
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    open-in-view: false
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
