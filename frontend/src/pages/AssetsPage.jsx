@@ -114,6 +114,10 @@ function AssetsPage() {
             >
                 <Typography
                     variant="h4"
+                    sx={{
+                    
+                    color: "#111"
+                }}
                 >
                     Assets
                 </Typography>

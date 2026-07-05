@@ -95,6 +95,10 @@ function AssignmentsPage() {
 
                 <Typography
                     variant="h4"
+                    sx={{
+                    
+                    color: "#111"
+                }}
                 >
                     Assignments
                 </Typography>

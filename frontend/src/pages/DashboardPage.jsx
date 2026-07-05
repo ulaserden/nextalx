@@ -61,7 +61,8 @@ function DashboardPage() {
             <Typography
                 variant="h4"
                 sx={{
-                    mb: 4
+                    mb: 4,
+                    color: "#111"
                 }}
             >
                 Dashboard

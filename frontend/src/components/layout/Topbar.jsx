@@ -1,10 +1,25 @@
 import {
     AppBar,
     Toolbar,
-    Typography
+    Typography,
+    IconButton
 } from "@mui/material";
 
+import {
+    DarkMode,
+    LightMode
+} from "@mui/icons-material";
+
+import {
+    useThemeContext
+} from "../../context/ThemeContext";
+
 function Topbar() {
+
+    const {
+        darkMode,
+        toggleTheme
+    } = useThemeContext();
 
     return (
         <AppBar
@@ -23,6 +38,23 @@ function Topbar() {
                 >
                     Enterprise IT Asset Management Platform
                 </Typography>
+
+                <IconButton
+                    color="inherit"
+                    onClick={
+                        toggleTheme
+                    }
+                >
+                    {
+                        darkMode
+                            ? (
+                                <LightMode />
+                            )
+                            : (
+                                <DarkMode />
+                            )
+                    }
+                </IconButton>
 
             </Toolbar>
         </AppBar>

@@ -262,6 +262,10 @@ function DepartmentsPage() {
             >
                 <Typography
                     variant="h4"
+                    sx={{
+                    
+                    color: "#111"
+                }}
                     fontWeight={600}
                 >
                     Departments
