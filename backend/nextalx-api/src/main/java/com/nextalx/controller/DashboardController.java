@@ -15,7 +15,8 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/stats")
-    public DashboardStatsResponse getStats() {
-        return dashboardService.getStats();
+    public DashboardStatsResponse getDashboardStats() {
+
+        return dashboardService.getDashboardStats();
     }
 }

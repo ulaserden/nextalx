@@ -65,7 +65,7 @@ public class Asset extends BaseEntity {
             AssetStatus.AVAILABLE;
 
     @ManyToOne(
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
     @JoinColumn(
             name = "category_id",

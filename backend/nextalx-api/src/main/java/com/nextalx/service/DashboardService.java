@@ -4,5 +4,6 @@ import com.nextalx.dto.response.DashboardStatsResponse;
 
 public interface DashboardService {
 
-    DashboardStatsResponse getStats();
+    DashboardStatsResponse getDashboardStats();
+
 }

@@ -45,7 +45,7 @@ export const activateCategory = async (
 ) => {
 
     const response =
-        await axiosClient.put(
+        await axiosClient.patch(
             `/categories/${id}/activate`
         );
 
@@ -57,7 +57,7 @@ export const deactivateCategory = async (
 ) => {
 
     const response =
-        await axiosClient.put(
+        await axiosClient.patch(
             `/categories/${id}/deactivate`
         );
 

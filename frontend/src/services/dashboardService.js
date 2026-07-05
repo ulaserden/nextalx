@@ -1,7 +1,7 @@
-import axiosClient from "../api/axiosClient";
+import api from "./api";
 
 export const getDashboardStats = async () => {
-    const response = await axiosClient.get(
+    const response = await api.get(
         "/dashboard/stats"
     );
 

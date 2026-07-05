@@ -1,21 +1,24 @@
 package com.nextalx.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DashboardStatsResponse {
 
-    private Long totalDepartments;
+    private long totalEmployees;
 
-    private Long totalEmployees;
+    private long totalAssets;
 
-    private Long totalAssets;
+    private long assignedAssets;
 
-    private Long assignedAssets;
+    private long availableAssets;
 
-    private Long availableAssets;
-
-    private Long totalCategories;
 }

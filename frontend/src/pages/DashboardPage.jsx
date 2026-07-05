@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-
 import {
-    Box,
-    CircularProgress,
+    Grid,
     Typography
 } from "@mui/material";
 
-import DashboardCards
-    from "../features/dashboard/DashboardCards";
+import {
+    useEffect,
+    useState
+} from "react";
+
+import StatCard
+    from "../components/dashboard/StatCard";
 
 import {
     getDashboardStats
@@ -15,66 +17,119 @@ import {
 
 function DashboardPage() {
 
-    const [stats, setStats] =
-        useState(null);
+    const [
+        stats,
+        setStats
+    ] = useState(null);
 
     useEffect(() => {
 
-        const fetchData =
-            async () => {
-
-                try {
-
-                    const data =
-                        await getDashboardStats();
-
-                    setStats(
-                        data
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
-                }
-            };
-
-        fetchData();
+        loadDashboard();
 
     }, []);
+
+    const loadDashboard = async () => {
+
+        try {
+
+            const data =
+                await getDashboardStats();
+
+            setStats(
+                data
+            );
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+        }
+    };
 
     if (!stats) {
 
         return (
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 5
-                }}
-            >
-                <CircularProgress />
-            </Box>
+            <Typography>
+                Loading...
+            </Typography>
         );
     }
 
     return (
-        <Box>
+        <>
             <Typography
                 variant="h4"
                 sx={{
-                    mb: 3,
-                    fontWeight: 600
+                    mb: 4
                 }}
             >
                 Dashboard
             </Typography>
 
-            <DashboardCards
-                stats={stats}
-            />
-        </Box>
+            <Grid
+                container
+                spacing={3}
+            >
+
+                <Grid
+                    size={{
+                        xs: 12,
+                        md: 3
+                    }}
+                >
+                    <StatCard
+                        title="Total Assets"
+                        value={
+                            stats.totalAssets
+                        }
+                    />
+                </Grid>
+
+                <Grid
+                    size={{
+                        xs: 12,
+                        md: 3
+                    }}
+                >
+                    <StatCard
+                        title="Assigned Assets"
+                        value={
+                            stats.assignedAssets
+                        }
+                    />
+                </Grid>
+
+                <Grid
+                    size={{
+                        xs: 12,
+                        md: 3
+                    }}
+                >
+                    <StatCard
+                        title="Available Assets"
+                        value={
+                            stats.availableAssets
+                        }
+                    />
+                </Grid>
+
+                <Grid
+                    size={{
+                        xs: 12,
+                        md: 3
+                    }}
+                >
+                    <StatCard
+                        title="Employees"
+                        value={
+                            stats.totalEmployees
+                        }
+                    />
+                </Grid>
+
+            </Grid>
+        </>
     );
 }
 

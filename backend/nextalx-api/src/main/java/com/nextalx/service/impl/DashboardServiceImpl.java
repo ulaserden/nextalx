@@ -2,9 +2,7 @@ package com.nextalx.service.impl;
 
 import com.nextalx.dto.response.DashboardStatsResponse;
 import com.nextalx.enums.AssetStatus;
-import com.nextalx.repository.AssetCategoryRepository;
 import com.nextalx.repository.AssetRepository;
-import com.nextalx.repository.DepartmentRepository;
 import com.nextalx.repository.EmployeeRepository;
 import com.nextalx.service.DashboardService;
 import lombok.RequiredArgsConstructor;
@@ -15,36 +13,40 @@ import org.springframework.stereotype.Service;
 public class DashboardServiceImpl
         implements DashboardService {
 
-    private final DepartmentRepository departmentRepository;
     private final EmployeeRepository employeeRepository;
     private final AssetRepository assetRepository;
-    private final AssetCategoryRepository assetCategoryRepository;
 
     @Override
-    public DashboardStatsResponse getStats() {
+    public DashboardStatsResponse getDashboardStats() {
+
+        long totalEmployees =
+                employeeRepository.count();
+
+        long totalAssets =
+                assetRepository.count();
+
+        long assignedAssets =
+                assetRepository.countByStatus(
+                        AssetStatus.ASSIGNED
+                );
+
+        long availableAssets =
+                assetRepository.countByStatus(
+                        AssetStatus.AVAILABLE
+                );
 
         return DashboardStatsResponse.builder()
-                .totalDepartments(
-                        departmentRepository.count()
-                )
                 .totalEmployees(
-                        employeeRepository.count()
+                        totalEmployees
                 )
                 .totalAssets(
-                        assetRepository.count()
+                        totalAssets
                 )
                 .assignedAssets(
-                        assetRepository.countByStatus(
-                                AssetStatus.ASSIGNED
-                        )
+                        assignedAssets
                 )
                 .availableAssets(
-                        assetRepository.countByStatus(
-                                AssetStatus.AVAILABLE
-                        )
-                )
-                .totalCategories(
-                        assetCategoryRepository.count()
+                        availableAssets
                 )
                 .build();
     }

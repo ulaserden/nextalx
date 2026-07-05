@@ -1,82 +1,141 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
 
 import {
     Box,
-    CircularProgress,
+    Button,
     Typography
 } from "@mui/material";
 
-import AssignmentsTable
-    from "../features/assignments/AssignmentsTable";
+import AssignmentTable
+    from "../components/assignments/AssignmentTable";
+
+import CreateAssignmentDialog
+    from "../components/assignments/CreateAssignmentDialog";
 
 import {
-    getAssignments
+    getAssignments,
+    createAssignment,
+    returnAssignment
 } from "../services/assignmentService";
 
 function AssignmentsPage() {
 
-    const [assignments, setAssignments] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [
+        assignments,
+        setAssignments
+    ] = useState([]);
+
+    const [
+        openDialog,
+        setOpenDialog
+    ] = useState(false);
 
     useEffect(() => {
 
-        const fetchAssignments = async () => {
+        loadAssignments();
 
-            try {
+    }, []);
 
-                const response = await getAssignments(
+    const loadAssignments =
+        async () => {
+
+            const data =
+                await getAssignments(
                     0,
                     100
                 );
 
-                setAssignments(
-                    response.content
-                );
-
-            } catch (error) {
-
-                console.error(error);
-
-            } finally {
-
-                setLoading(false);
-            }
+            setAssignments(
+                data.content
+            );
         };
 
-        fetchAssignments();
+    const handleCreate =
+        async (
+            assignmentData
+        ) => {
 
-    }, []);
+            await createAssignment(
+                assignmentData
+            );
 
-    if (loading) {
-        return (
+            setOpenDialog(
+                false
+            );
+
+            loadAssignments();
+        };
+
+    const handleReturn =
+        async (
+            id
+        ) => {
+
+            await returnAssignment(
+                id
+            );
+
+            loadAssignments();
+        };
+
+    return (
+        <>
+
             <Box
                 sx={{
                     display: "flex",
-                    justifyContent: "center",
-                    mt: 5
+                    justifyContent:
+                        "space-between",
+                    mb: 3
                 }}
             >
-                <CircularProgress />
+
+                <Typography
+                    variant="h4"
+                >
+                    Assignments
+                </Typography>
+
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        setOpenDialog(
+                            true
+                        )
+                    }
+                >
+                    Assign Asset
+                </Button>
+
             </Box>
-        );
-    }
 
-    return (
-        <Box>
-            <Typography
-                variant="h4"
-                sx={{
-                    mb: 3,
-                    fontWeight: 600
-                }}
-            >
-                Assignments
-            </Typography>
-
-            <AssignmentsTable
-                assignments={assignments}
+            <AssignmentTable
+                assignments={
+                    assignments
+                }
+                onReturn={
+                    handleReturn
+                }
             />
-        </Box>
+
+            <CreateAssignmentDialog
+                open={
+                    openDialog
+                }
+                onClose={() =>
+                    setOpenDialog(
+                        false
+                    )
+                }
+                onSave={
+                    handleCreate
+                }
+            />
+
+        </>
     );
 }
 
