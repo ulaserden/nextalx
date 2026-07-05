@@ -1,123 +1,91 @@
-function getAssignmentStatus(
-    returnedDate
-) {
+import { DataGrid } from "@mui/x-data-grid";
+import { Paper, Chip } from "@mui/material";
 
-    const style = {
-        padding: "6px 12px",
-        borderRadius: "20px",
-        fontSize: "12px",
-        fontWeight: "bold"
-    };
+function AssignmentsTable({ assignments }) {
 
-    if (returnedDate === null) {
-        return (
-            <span
-                style={{
-                    ...style,
-                    backgroundColor: "#fee2e2",
-                    color: "#991b1b"
+    const columns = [
+        {
+            field: "id",
+            headerName: "ID",
+            width: 80
+        },
+        {
+            field: "employeeName",
+            headerName: "Employee",
+            width: 220
+        },
+        {
+            field: "assetTag",
+            headerName: "Asset Tag",
+            width: 160
+        },
+        {
+            field: "assignedDate",
+            headerName: "Assigned Date",
+            width: 150
+        },
+        {
+            field: "returnedDate",
+            headerName: "Returned Date",
+            width: 150,
+            valueGetter: (_, row) =>
+                row.returnedDate || "-"
+        },
+        {
+            field: "status",
+            headerName: "Status",
+            width: 140,
+            renderCell: (params) => {
+
+                const returned =
+                    params.row.returnedDate !== null;
+
+                return (
+                    <Chip
+                        label={
+                            returned
+                                ? "RETURNED"
+                                : "ACTIVE"
+                        }
+                        color={
+                            returned
+                                ? "success"
+                                : "warning"
+                        }
+                        size="small"
+                    />
+                );
+            }
+        },
+        {
+            field: "note",
+            headerName: "Note",
+            flex: 1
+        }
+    ];
+
+    return (
+        <Paper
+            elevation={3}
+            sx={{
+                height: 600,
+                width: "100%"
+            }}
+        >
+            <DataGrid
+                rows={assignments}
+                columns={columns}
+                pageSizeOptions={[5, 10, 25]}
+                initialState={{
+                    pagination: {
+                        paginationModel: {
+                            pageSize: 10
+                        }
+                    }
                 }}
-            >
-                Active
-            </span>
-        );
-    }
-
-    return (
-        <span
-            style={{
-                ...style,
-                backgroundColor: "#dcfce7",
-                color: "#166534"
-            }}
-        >
-            Returned
-        </span>
-    );
-}
-
-function AssignmentsTable({
-    assignments
-}) {
-
-    return (
-        <table
-            style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                background: "white"
-            }}
-        >
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Employee</th>
-                    <th>Asset</th>
-                    <th>Assigned Date</th>
-                    <th>Returned Date</th>
-                    <th>Status</th>
-                    <th>Note</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {
-                    assignments.map(
-                        assignment => (
-                            <tr
-                                key={
-                                    assignment.id
-                                }
-                            >
-                                <td>
-                                    {assignment.id}
-                                </td>
-
-                                <td>
-                                    {
-                                        assignment.employeeName
-                                    }
-                                </td>
-
-                                <td>
-                                    {
-                                        assignment.assetTag
-                                    }
-                                </td>
-
-                                <td>
-                                    {
-                                        assignment.assignedDate
-                                    }
-                                </td>
-
-                                <td>
-                                    {
-                                        assignment.returnedDate
-                                            ?? "-"
-                                    }
-                                </td>
-
-                                <td>
-                                    {
-                                        getAssignmentStatus(
-                                            assignment.returnedDate
-                                        )
-                                    }
-                                </td>
-
-                                <td>
-                                    {
-                                        assignment.note
-                                    }
-                                </td>
-
-                            </tr>
-                        )
-                    )
-                }
-            </tbody>
-        </table>
+                disableRowSelectionOnClick
+            />
+        </Paper>
     );
 }
 

@@ -1,18 +1,31 @@
+import {
+    AppBar,
+    Toolbar,
+    Typography
+} from "@mui/material";
+
 function Topbar() {
+
     return (
-        <div
-            style={{
-                height: "70px",
-                backgroundColor: "white",
-                borderBottom: "1px solid #e2e8f0",
-                display: "flex",
-                alignItems: "center",
-                padding: "0 30px",
-                boxSizing: "border-box"
-            }}
+        <AppBar
+            position="static"
+            color="primary"
+            elevation={1}
         >
-            <h3>Enterprise IT Asset Management Platform</h3>
-        </div>
+            <Toolbar>
+
+                <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{
+                        flexGrow: 1
+                    }}
+                >
+                    Enterprise IT Asset Management Platform
+                </Typography>
+
+            </Toolbar>
+        </AppBar>
     );
 }
 

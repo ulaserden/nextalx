@@ -1,32 +1,40 @@
-### ============================================
-### EMPLOYEE API TESTS
-### ============================================
+### Get Employees
+GET http://localhost:8080/api/v1/employees?page=0&size=100
 
-### Get Employees (Default Pagination)
-GET http://localhost:8080/api/v1/employees
-
-###
-
-### Get Employees (Page 0, Size 10)
-GET http://localhost:8080/api/v1/employees?page=0&size=10
-
-###
-
-### Get Employees (Page 1, Size 5)
-GET http://localhost:8080/api/v1/employees?page=1&size=5
-
-###
 
 ### Create Employee
 POST http://localhost:8080/api/v1/employees
 Content-Type: application/json
 
 {
-  "firstName": "Ahmet",
-  "lastName": "Yılmaz",
-  "email": "ahmet@nextalx.com",
+  "firstName": "Mehmet",
+  "lastName": "Demir",
+  "email": "mehmet.demir@nextalx.com",
   "phone": "05551234567",
-  "jobTitle": "Backend Developer",
+  "jobTitle": "Frontend Developer",
   "status": "ACTIVE",
   "departmentId": 1
 }
+
+
+### Update Employee
+PUT http://localhost:8080/api/v1/employees/1
+Content-Type: application/json
+
+{
+  "firstName": "Ahmet",
+  "lastName": "Yılmaz",
+  "email": "ahmet@nextalx.com",
+  "phone": "05559998877",
+  "jobTitle": "Senior Backend Developer",
+  "status": "ACTIVE",
+  "departmentId": 1
+}
+
+
+### Deactivate Employee
+PATCH http://localhost:8080/api/v1/employees/1/deactivate
+
+
+### Activate Employee
+PATCH http://localhost:8080/api/v1/employees/1/activate

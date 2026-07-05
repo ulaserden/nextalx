@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 
+import {
+    Box,
+    CircularProgress,
+    Typography
+} from "@mui/material";
+
 import DashboardCards
     from "../features/dashboard/DashboardCards";
 
@@ -9,44 +15,66 @@ import {
 
 function DashboardPage() {
 
-    const [stats, setStats] = useState(null);
+    const [stats, setStats] =
+        useState(null);
 
     useEffect(() => {
 
-        const fetchData = async () => {
+        const fetchData =
+            async () => {
 
-            try {
+                try {
 
-                const data =
-                    await getDashboardStats();
+                    const data =
+                        await getDashboardStats();
 
-                setStats(data);
+                    setStats(
+                        data
+                    );
 
-            } catch (error) {
-                console.error(error);
-            }
-        };
+                } catch (error) {
+
+                    console.error(
+                        error
+                    );
+                }
+            };
 
         fetchData();
 
     }, []);
 
     if (!stats) {
-        return <h2>Loading...</h2>;
+
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mt: 5
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
     }
 
     return (
-        <div>
-
-            <h1>
+        <Box>
+            <Typography
+                variant="h4"
+                sx={{
+                    mb: 3,
+                    fontWeight: 600
+                }}
+            >
                 Dashboard
-            </h1>
+            </Typography>
 
             <DashboardCards
                 stats={stats}
             />
-
-        </div>
+        </Box>
     );
 }
 

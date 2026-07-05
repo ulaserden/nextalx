@@ -3,16 +3,19 @@ POST http://localhost:8080/api/v1/assets
 Content-Type: application/json
 
 {
-  "assetTag": "NXT-000001",
-  "serialNumber": "PF4AB12345",
-  "brand": "Lenovo",
-  "model": "ThinkPad T14 Gen 5",
-  "purchaseDate": "2026-07-01",
-  "warrantyEndDate": "2029-07-01",
+  "assetTag": "LT-001",
+  "name": "MacBook Pro 16",
+  "brand": "Apple",
+  "model": "M4 Pro",
+  "serialNumber": "APL-2026-001",
+  "purchaseDate": "2026-01-01",
+  "warrantyEndDate": "2029-01-01",
   "status": "AVAILABLE",
-  "categoryId": 1
+  "categoryId": 1,
+  "purchasePrice": 125000,
+  "supplier": "Apple Türkiye"
 }
 
 ###
 
-GET http://localhost:8080/api/v1/assets?page=0&size=10
+GET http://localhost:8080/api/v1/assets?page=0&size=100

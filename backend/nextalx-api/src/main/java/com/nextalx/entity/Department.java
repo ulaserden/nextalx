@@ -14,9 +14,24 @@ import lombok.Setter;
 @Table(name = "departments")
 public class Department extends BaseEntity {
 
-    @Column(name = "name", nullable = false, unique = true, length = 100)
+    @Column(
+            name = "name",
+            nullable = false,
+            unique = true,
+            length = 100
+    )
     private String name;
 
-    @Column(name = "description", length = 255)
+    @Column(
+            name = "description",
+            length = 255
+    )
     private String description;
+
+    @Column(
+            name = "status",
+            nullable = false,
+            length = 20
+    )
+    private String status = "ACTIVE";
 }

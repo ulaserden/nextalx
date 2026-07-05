@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -16,38 +17,59 @@ import java.time.LocalDate;
 public class Asset extends BaseEntity {
 
     @Column(
-            name = "asset_tag",
             nullable = false,
-            unique = true
+            unique = true,
+            length = 50
     )
     private String assetTag;
 
     @Column(
-            name = "serial_number",
-            unique = true
+            nullable = false,
+            length = 150
+    )
+    private String name;
+
+    @Column(length = 100)
+    private String brand;
+
+    @Column(length = 100)
+    private String model;
+
+    @Column(
+            unique = true,
+            length = 100
     )
     private String serialNumber;
 
-    @Column(nullable = false)
-    private String brand;
-
-    @Column(nullable = false)
-    private String model;
-
-    @Column(name = "purchase_date")
     private LocalDate purchaseDate;
 
-    @Column(name = "warranty_end_date")
     private LocalDate warrantyEndDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AssetStatus status;
+    @Column(
+            precision = 12,
+            scale = 2
+    )
+    private BigDecimal purchasePrice;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Column(length = 150)
+    private String supplier;
+
+    @Enumerated(
+            EnumType.STRING
+    )
+    @Column(
+            nullable = false,
+            length = 30
+    )
+    private AssetStatus status =
+            AssetStatus.AVAILABLE;
+
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(
             name = "category_id",
             nullable = false
     )
-    private AssetCategory category;
+    private Category category;
 }

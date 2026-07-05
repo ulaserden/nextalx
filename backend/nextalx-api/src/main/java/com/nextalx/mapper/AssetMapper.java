@@ -3,7 +3,8 @@ package com.nextalx.mapper;
 import com.nextalx.dto.request.CreateAssetRequest;
 import com.nextalx.dto.response.AssetResponse;
 import com.nextalx.entity.Asset;
-import com.nextalx.entity.AssetCategory;
+import com.nextalx.entity.Category;
+import com.nextalx.enums.AssetStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,19 +12,55 @@ public class AssetMapper {
 
     public Asset toEntity(
             CreateAssetRequest request,
-            AssetCategory category
+            Category category
     ) {
 
-        Asset asset = new Asset();
+        Asset asset =
+                new Asset();
 
-        asset.setAssetTag(request.getAssetTag());
-        asset.setSerialNumber(request.getSerialNumber());
-        asset.setBrand(request.getBrand());
-        asset.setModel(request.getModel());
-        asset.setPurchaseDate(request.getPurchaseDate());
-        asset.setWarrantyEndDate(request.getWarrantyEndDate());
-        asset.setStatus(request.getStatus());
-        asset.setCategory(category);
+        asset.setAssetTag(
+                request.getAssetTag()
+        );
+
+        asset.setName(
+                request.getName()
+        );
+
+        asset.setBrand(
+                request.getBrand()
+        );
+
+        asset.setModel(
+                request.getModel()
+        );
+
+        asset.setSerialNumber(
+                request.getSerialNumber()
+        );
+
+        asset.setPurchaseDate(
+                request.getPurchaseDate()
+        );
+
+        asset.setWarrantyEndDate(
+                request.getWarrantyEndDate()
+        );
+
+        asset.setPurchasePrice(
+                request.getPurchasePrice()
+        );
+
+        asset.setSupplier(
+                request.getSupplier()
+        );
+
+        asset.setStatus(
+                AssetStatus.AVAILABLE
+        );
+
+        asset.setCategory(
+                category
+        );
 
         return asset;
     }
@@ -33,16 +70,45 @@ public class AssetMapper {
     ) {
 
         return AssetResponse.builder()
-                .id(asset.getId())
-                .assetTag(asset.getAssetTag())
-                .serialNumber(asset.getSerialNumber())
-                .brand(asset.getBrand())
-                .model(asset.getModel())
-                .purchaseDate(asset.getPurchaseDate())
-                .warrantyEndDate(asset.getWarrantyEndDate())
-                .status(asset.getStatus())
-                .categoryId(asset.getCategory().getId())
-                .categoryName(asset.getCategory().getName())
+                .id(
+                        asset.getId()
+                )
+                .assetTag(
+                        asset.getAssetTag()
+                )
+                .name(
+                        asset.getName()
+                )
+                .brand(
+                        asset.getBrand()
+                )
+                .model(
+                        asset.getModel()
+                )
+                .serialNumber(
+                        asset.getSerialNumber()
+                )
+                .purchaseDate(
+                        asset.getPurchaseDate()
+                )
+                .warrantyEndDate(
+                        asset.getWarrantyEndDate()
+                )
+                .purchasePrice(
+                        asset.getPurchasePrice()
+                )
+                .supplier(
+                        asset.getSupplier()
+                )
+                .status(
+                        asset.getStatus().name()
+                )
+                .categoryId(
+                        asset.getCategory().getId()
+                )
+                .categoryName(
+                        asset.getCategory().getName()
+                )
                 .build();
     }
 }

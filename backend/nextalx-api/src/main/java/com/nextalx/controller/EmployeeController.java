@@ -1,6 +1,7 @@
 package com.nextalx.controller;
 
 import com.nextalx.dto.request.CreateEmployeeRequest;
+import com.nextalx.dto.request.UpdateEmployeeRequest;
 import com.nextalx.dto.response.EmployeeResponse;
 import com.nextalx.service.EmployeeService;
 import jakarta.validation.Valid;
@@ -45,6 +46,41 @@ public class EmployeeController {
 
         return employeeService.createEmployee(
                 request
+        );
+    }
+
+    @PutMapping("/{id}")
+    public EmployeeResponse updateEmployee(
+            @PathVariable Long id,
+
+            @Valid
+            @RequestBody
+            UpdateEmployeeRequest request
+    ) {
+
+        return employeeService.updateEmployee(
+                id,
+                request
+        );
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public EmployeeResponse deactivateEmployee(
+            @PathVariable Long id
+    ) {
+
+        return employeeService.deactivateEmployee(
+                id
+        );
+    }
+
+    @PatchMapping("/{id}/activate")
+    public EmployeeResponse activateEmployee(
+            @PathVariable Long id
+    ) {
+
+        return employeeService.activateEmployee(
+                id
         );
     }
 }

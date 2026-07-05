@@ -6,6 +6,7 @@ import com.nextalx.entity.Asset;
 import com.nextalx.entity.Assignment;
 import com.nextalx.entity.Employee;
 import com.nextalx.enums.AssetStatus;
+import com.nextalx.enums.AssignmentStatus;
 import com.nextalx.exception.AssetAlreadyAssignedException;
 import com.nextalx.exception.AssetNotFoundException;
 import com.nextalx.exception.AssignmentNotFoundException;
@@ -19,11 +20,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AssignmentServiceImpl
         implements AssignmentService {
 
@@ -72,10 +75,12 @@ public class AssignmentServiceImpl
                                         "Asset not found."
                                 ));
 
-        if (assignmentRepository
-                .existsByAssetIdAndReturnedDateIsNull(
-                        asset.getId()
-                )) {
+        if (
+                assignmentRepository
+                        .existsByAssetIdAndReturnedDateIsNull(
+                                asset.getId()
+                        )
+        ) {
 
             throw new AssetAlreadyAssignedException(
                     "Asset is already assigned."
@@ -88,6 +93,10 @@ public class AssignmentServiceImpl
                         employee,
                         asset
                 );
+
+        assignment.setStatus(
+                AssignmentStatus.ACTIVE
+        );
 
         asset.setStatus(
                 AssetStatus.ASSIGNED
@@ -123,6 +132,10 @@ public class AssignmentServiceImpl
 
         assignment.setReturnedDate(
                 LocalDate.now()
+        );
+
+        assignment.setStatus(
+                AssignmentStatus.RETURNED
         );
 
         Asset asset =

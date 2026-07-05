@@ -1,70 +1,79 @@
-function DashboardCards({
-    stats
-}) {
+import {
+    Card,
+    CardContent,
+    Grid,
+    Typography
+} from "@mui/material";
+
+function DashboardCards({ stats }) {
+
+    const cards = [
+        {
+            title: "Departments",
+            value: stats.totalDepartments
+        },
+        {
+            title: "Employees",
+            value: stats.totalEmployees
+        },
+        {
+            title: "Assets",
+            value: stats.totalAssets
+        },
+        {
+            title: "Assigned Assets",
+            value: stats.assignedAssets
+        },
+        {
+            title: "Available Assets",
+            value: stats.availableAssets
+        },
+        {
+            title: "Categories",
+            value: stats.totalCategories
+        }
+    ];
 
     return (
-        <div
-            style={{
-                display: "grid",
-                gridTemplateColumns:
-                    "repeat(auto-fit, minmax(250px, 1fr))",
-                gap: "20px"
-            }}
+        <Grid
+            container
+            spacing={3}
         >
-            <Card
-                title="Departments"
-                value={stats.totalDepartments}
-            />
+            {
+                cards.map(card => (
+                    <Grid
+                        size={{
+                            xs: 12,
+                            sm: 6,
+                            md: 4
+                        }}
+                        key={card.title}
+                    >
+                        <Card
+                            elevation={3}
+                        >
+                            <CardContent>
 
-            <Card
-                title="Employees"
-                value={stats.totalEmployees}
-            />
+                                <Typography
+                                    variant="h6"
+                                    gutterBottom
+                                >
+                                    {card.title}
+                                </Typography>
 
-            <Card
-                title="Assets"
-                value={stats.totalAssets}
-            />
+                                <Typography
+                                    variant="h3"
+                                    fontWeight="bold"
+                                >
+                                    {card.value}
+                                </Typography>
 
-            <Card
-                title="Assigned Assets"
-                value={stats.assignedAssets}
-            />
-
-            <Card
-                title="Available Assets"
-                value={stats.availableAssets}
-            />
-
-            <Card
-                title="Categories"
-                value={stats.totalCategories}
-            />
-        </div>
-    );
-}
-
-function Card({
-    title,
-    value
-}) {
-
-    return (
-        <div
-            style={{
-                backgroundColor: "white",
-                padding: "25px",
-                borderRadius: "12px",
-                boxShadow:
-                    "0 2px 8px rgba(0,0,0,0.08)"
-            }}
-        >
-            <h3>{title}</h3>
-
-            <h1>
-                {value}
-            </h1>
-        </div>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))
+            }
+        </Grid>
     );
 }
 

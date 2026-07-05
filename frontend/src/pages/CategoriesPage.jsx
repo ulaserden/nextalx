@@ -1,10 +1,29 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
+
+import {
+    Alert,
+    Box,
+    Button,
+    CircularProgress,
+    Snackbar,
+    Typography
+} from "@mui/material";
 
 import CategoriesTable
     from "../features/categories/CategoriesTable";
 
+import CategoryDialog
+    from "../features/categories/CategoryDialog";
+
 import {
-    getCategories
+    activateCategory,
+    createCategory,
+    deactivateCategory,
+    getCategories,
+    updateCategory
 } from "../services/categoryService";
 
 function CategoriesPage() {
@@ -15,108 +34,278 @@ function CategoriesPage() {
     const [loading, setLoading] =
         useState(true);
 
-    const [page, setPage] =
-        useState(0);
+    const [dialogOpen, setDialogOpen] =
+        useState(false);
 
-    const [totalPages, setTotalPages] =
-        useState(0);
+    const [selectedCategory,
+        setSelectedCategory] =
+        useState(null);
+
+    const [snackbar, setSnackbar] =
+        useState({
+            open: false,
+            message: "",
+            severity: "success"
+        });
+
+    const fetchCategories =
+        async () => {
+
+            try {
+
+                const response =
+                    await getCategories(
+                        0,
+                        100
+                    );
+
+                setCategories(
+                    response.content
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+            } finally {
+
+                setLoading(false);
+            }
+        };
 
     useEffect(() => {
 
-        const fetchCategories =
-            async () => {
-
-                try {
-
-                    const response =
-                        await getCategories(
-                            page,
-                            10
-                        );
-
-                    setCategories(
-                        response.content
-                    );
-
-                    setTotalPages(
-                        response.totalPages
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
-
-                } finally {
-
-                    setLoading(
-                        false
-                    );
-                }
-            };
-
         fetchCategories();
 
-    }, [page]);
+    }, []);
+
+    const showSnackbar =
+        (
+            message,
+            severity = "success"
+        ) => {
+
+            setSnackbar({
+                open: true,
+                message,
+                severity
+            });
+        };
+
+    const handleCreateCategory =
+        async (categoryData) => {
+
+            try {
+
+                await createCategory(
+                    categoryData
+                );
+
+                setDialogOpen(false);
+
+                await fetchCategories();
+
+                showSnackbar(
+                    "Category created successfully."
+                );
+
+            } catch (error) {
+
+                showSnackbar(
+                    "Category could not be created.",
+                    "error"
+                );
+            }
+        };
+
+    const handleUpdateCategory =
+        async (categoryData) => {
+
+            try {
+
+                await updateCategory(
+                    selectedCategory.id,
+                    categoryData
+                );
+
+                setDialogOpen(false);
+
+                setSelectedCategory(
+                    null
+                );
+
+                await fetchCategories();
+
+                showSnackbar(
+                    "Category updated successfully."
+                );
+
+            } catch (error) {
+
+                showSnackbar(
+                    "Category could not be updated.",
+                    "error"
+                );
+            }
+        };
+
+    const handleDeactivateCategory =
+        async (category) => {
+
+            try {
+
+                await deactivateCategory(
+                    category.id
+                );
+
+                await fetchCategories();
+
+                showSnackbar(
+                    "Category deactivated successfully."
+                );
+
+            } catch (error) {
+
+                showSnackbar(
+                    "Category could not be deactivated.",
+                    "error"
+                );
+            }
+        };
+
+    const handleActivateCategory =
+        async (category) => {
+
+            try {
+
+                await activateCategory(
+                    category.id
+                );
+
+                await fetchCategories();
+
+                showSnackbar(
+                    "Category activated successfully."
+                );
+
+            } catch (error) {
+
+                showSnackbar(
+                    "Category could not be activated.",
+                    "error"
+                );
+            }
+        };
 
     if (loading) {
-        return <h2>Loading...</h2>;
+
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent:
+                        "center",
+                    mt: 5
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
     }
 
     return (
-        <div>
+        <Box>
 
-            <h1>
-                Categories
-            </h1>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent:
+                        "space-between",
+                    alignItems: "center",
+                    mb: 3
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    fontWeight={600}
+                >
+                    Categories
+                </Typography>
+
+                <Button
+                    variant="contained"
+                    onClick={() => {
+
+                        setSelectedCategory(
+                            null
+                        );
+
+                        setDialogOpen(true);
+                    }}
+                >
+                    Add Category
+                </Button>
+            </Box>
 
             <CategoriesTable
-                categories={
-                    categories
+                categories={categories}
+                onEdit={(category) => {
+
+                    setSelectedCategory(
+                        category
+                    );
+
+                    setDialogOpen(true);
+                }}
+                onActivate={
+                    handleActivateCategory
+                }
+                onDeactivate={
+                    handleDeactivateCategory
                 }
             />
 
-            <div
-                style={{
-                    marginTop: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px"
+            <CategoryDialog
+                open={dialogOpen}
+                category={selectedCategory}
+                onClose={() => {
+
+                    setDialogOpen(false);
+
+                    setSelectedCategory(
+                        null
+                    );
                 }}
+                onSubmit={
+                    selectedCategory
+                        ? handleUpdateCategory
+                        : handleCreateCategory
+                }
+            />
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() =>
+                    setSnackbar({
+                        ...snackbar,
+                        open: false
+                    })
+                }
             >
-                <button
-                    disabled={
-                        page === 0
+                <Alert
+                    severity={
+                        snackbar.severity
                     }
-                    onClick={() =>
-                        setPage(
-                            page - 1
-                        )
-                    }
+                    variant="filled"
                 >
-                    Previous
-                </button>
-
-                <span>
-                    Page {page + 1} / {totalPages}
-                </span>
-
-                <button
-                    disabled={
-                        page + 1 >= totalPages
+                    {
+                        snackbar.message
                     }
-                    onClick={() =>
-                        setPage(
-                            page + 1
-                        )
-                    }
-                >
-                    Next
-                </button>
-            </div>
+                </Alert>
+            </Snackbar>
 
-        </div>
+        </Box>
     );
 }
 

@@ -1,10 +1,29 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
+
+import {
+    Alert,
+    Box,
+    Button,
+    CircularProgress,
+    Snackbar,
+    Typography
+} from "@mui/material";
 
 import DepartmentsTable
     from "../features/departments/DepartmentsTable";
 
+import DepartmentDialog
+    from "../features/departments/DepartmentDialog";
+
 import {
-    getDepartments
+    activateDepartment,
+    createDepartment,
+    deactivateDepartment,
+    getDepartments,
+    updateDepartment
 } from "../services/departmentService";
 
 function DepartmentsPage() {
@@ -15,108 +34,324 @@ function DepartmentsPage() {
     const [loading, setLoading] =
         useState(true);
 
-    const [page, setPage] =
-        useState(0);
+    const [dialogOpen, setDialogOpen] =
+        useState(false);
 
-    const [totalPages, setTotalPages] =
-        useState(0);
+    const [selectedDepartment,
+        setSelectedDepartment] =
+        useState(null);
+
+    const [snackbar, setSnackbar] =
+        useState({
+            open: false,
+            message: "",
+            severity: "success"
+        });
+
+    const showSnackbar = (
+        message,
+        severity = "success"
+    ) => {
+
+        setSnackbar({
+            open: true,
+            message,
+            severity
+        });
+    };
+
+    const handleCloseSnackbar =
+        () => {
+
+            setSnackbar(
+                previous => ({
+                    ...previous,
+                    open: false
+                })
+            );
+        };
+
+    const fetchDepartments =
+        async () => {
+
+            try {
+
+                const response =
+                    await getDepartments(
+                        0,
+                        100
+                    );
+
+                setDepartments(
+                    response.content
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Departments could not be loaded.",
+                    "error"
+                );
+
+            } finally {
+
+                setLoading(false);
+            }
+        };
 
     useEffect(() => {
 
-        const fetchDepartments =
-            async () => {
-
-                try {
-
-                    const response =
-                        await getDepartments(
-                            page,
-                            10
-                        );
-
-                    setDepartments(
-                        response.content
-                    );
-
-                    setTotalPages(
-                        response.totalPages
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
-
-                } finally {
-
-                    setLoading(
-                        false
-                    );
-                }
-            };
-
         fetchDepartments();
 
-    }, [page]);
+    }, []);
+
+    const handleCreateDepartment =
+        async (departmentData) => {
+
+            try {
+
+                await createDepartment(
+                    departmentData
+                );
+
+                setDialogOpen(
+                    false
+                );
+
+                await fetchDepartments();
+
+                showSnackbar(
+                    "Department created successfully."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Department could not be created.",
+                    "error"
+                );
+            }
+        };
+
+    const handleUpdateDepartment =
+        async (departmentData) => {
+
+            try {
+
+                await updateDepartment(
+                    selectedDepartment.id,
+                    departmentData
+                );
+
+                setDialogOpen(
+                    false
+                );
+
+                setSelectedDepartment(
+                    null
+                );
+
+                await fetchDepartments();
+
+                showSnackbar(
+                    "Department updated successfully."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Department could not be updated.",
+                    "error"
+                );
+            }
+        };
+
+    const handleDeactivateDepartment =
+        async (department) => {
+
+            const confirmed =
+                window.confirm(
+                    `${department.name} departmanını pasife almak istiyor musunuz?`
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+
+                await deactivateDepartment(
+                    department.id
+                );
+
+                await fetchDepartments();
+
+                showSnackbar(
+                    "Department deactivated successfully."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Department could not be deactivated.",
+                    "error"
+                );
+            }
+        };
+
+    const handleActivateDepartment =
+        async (department) => {
+
+            try {
+
+                await activateDepartment(
+                    department.id
+                );
+
+                await fetchDepartments();
+
+                showSnackbar(
+                    "Department activated successfully."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Department could not be activated.",
+                    "error"
+                );
+            }
+        };
 
     if (loading) {
-        return <h2>Loading...</h2>;
+
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mt: 5
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
     }
 
     return (
-        <div>
+        <Box>
 
-            <h1>
-                Departments
-            </h1>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent:
+                        "space-between",
+                    alignItems: "center",
+                    mb: 3
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    fontWeight={600}
+                >
+                    Departments
+                </Typography>
+
+                <Button
+                    variant="contained"
+                    onClick={() => {
+
+                        setSelectedDepartment(
+                            null
+                        );
+
+                        setDialogOpen(
+                            true
+                        );
+                    }}
+                >
+                    Add Department
+                </Button>
+            </Box>
 
             <DepartmentsTable
-                departments={
-                    departments
+                departments={departments}
+                onEdit={(department) => {
+
+                    setSelectedDepartment(
+                        department
+                    );
+
+                    setDialogOpen(
+                        true
+                    );
+                }}
+                onDeactivate={
+                    handleDeactivateDepartment
+                }
+                onActivate={
+                    handleActivateDepartment
                 }
             />
 
-            <div
-                style={{
-                    marginTop: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px"
+            <DepartmentDialog
+                open={dialogOpen}
+                department={
+                    selectedDepartment
+                }
+                onClose={() => {
+
+                    setDialogOpen(
+                        false
+                    );
+
+                    setSelectedDepartment(
+                        null
+                    );
+                }}
+                onSubmit={
+                    selectedDepartment
+                        ? handleUpdateDepartment
+                        : handleCreateDepartment
+                }
+            />
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right"
                 }}
             >
-                <button
-                    disabled={
-                        page === 0
+                <Alert
+                    severity={
+                        snackbar.severity
                     }
-                    onClick={() =>
-                        setPage(
-                            page - 1
-                        )
+                    onClose={
+                        handleCloseSnackbar
                     }
+                    variant="filled"
+                    sx={{
+                        width: "100%"
+                    }}
                 >
-                    Previous
-                </button>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
 
-                <span>
-                    Page {page + 1} / {totalPages}
-                </span>
-
-                <button
-                    disabled={
-                        page + 1 >= totalPages
-                    }
-                    onClick={() =>
-                        setPage(
-                            page + 1
-                        )
-                    }
-                >
-                    Next
-                </button>
-            </div>
-
-        </div>
+        </Box>
     );
 }
 

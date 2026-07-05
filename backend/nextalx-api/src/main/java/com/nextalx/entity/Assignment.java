@@ -1,5 +1,6 @@
 package com.nextalx.entity;
 
+import com.nextalx.enums.AssignmentStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,26 +15,47 @@ import java.time.LocalDate;
 @Table(name = "assignments")
 public class Assignment extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "employee_id",
             nullable = false
     )
     private Employee employee;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "asset_id",
             nullable = false
     )
     private Asset asset;
 
-    @Column(name = "assigned_date", nullable = false)
+    @Column(
+            name = "assigned_date",
+            nullable = false
+    )
     private LocalDate assignedDate;
 
-    @Column(name = "returned_date")
+    @Column(
+            name = "expected_return_date"
+    )
+    private LocalDate expectedReturnDate;
+
+    @Column(
+            name = "returned_date"
+    )
     private LocalDate returnedDate;
 
-    @Column(name = "notes", length = 500)
-    private String note;
+    @Column(
+            name = "notes",
+            length = 500
+    )
+    private String notes;
+
+    @Enumerated(EnumType.STRING)
+    @Column(
+            name = "status",
+            nullable = false
+    )
+    private AssignmentStatus status =
+            AssignmentStatus.ACTIVE;
 }

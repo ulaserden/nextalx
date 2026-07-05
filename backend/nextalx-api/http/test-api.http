@@ -1,0 +1,85 @@
+### ==========================================
+### CREATE CATEGORY
+### ==========================================
+
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Laptop",
+  "description": "Laptop devices"
+}
+
+###
+
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Desktop",
+  "description": "Desktop computers"
+}
+
+###
+
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Monitor",
+  "description": "Monitor devices"
+}
+
+###
+
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Printer",
+  "description": "Printer devices"
+}
+
+###
+
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Network Equipment",
+  "description": "Switches, routers and firewalls"
+}
+
+###
+
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Mobile Device",
+  "description": "Phones and tablets"
+}
+
+###
+
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Accessory",
+  "description": "Keyboard, mouse and accessories"
+}
+
+###
+
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Server",
+  "description": "Physical and virtual servers"
+}
+
+###
+
+GET http://localhost:8080/api/v1/categories?page=0&size=100

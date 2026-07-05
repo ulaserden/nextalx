@@ -12,4 +12,6 @@ public class DepartmentResponse {
     private String name;
 
     private String description;
+
+    private String status;
 }

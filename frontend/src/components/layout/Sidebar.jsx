@@ -1,61 +1,110 @@
+import {
+    Drawer,
+    Toolbar,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Typography,
+    Divider
+} from "@mui/material";
+
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleIcon from "@mui/icons-material/People";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import ComputerIcon from "@mui/icons-material/Computer";
+import CategoryIcon from "@mui/icons-material/Category";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+
 import { Link } from "react-router-dom";
 
+const drawerWidth = 240;
+
+const menuItems = [
+    {
+        text: "Dashboard",
+        path: "/",
+        icon: <DashboardIcon />
+    },
+    {
+        text: "Employees",
+        path: "/employees",
+        icon: <PeopleIcon />
+    },
+    {
+        text: "Departments",
+        path: "/departments",
+        icon: <ApartmentIcon />
+    },
+    {
+        text: "Assets",
+        path: "/assets",
+        icon: <ComputerIcon />
+    },
+    {
+        text: "Categories",
+        path: "/categories",
+        icon: <CategoryIcon />
+    },
+    {
+        text: "Assignments",
+        path: "/assignments",
+        icon: <AssignmentIcon />
+    }
+];
+
 function Sidebar() {
+
     return (
-        <div
-            style={{
-                width: "250px",
-                height: "100vh",
-                backgroundColor: "#1e293b",
-                color: "white",
-                padding: "20px",
-                boxSizing: "border-box"
+        <Drawer
+            variant="permanent"
+            sx={{
+                width: drawerWidth,
+                flexShrink: 0,
+                "& .MuiDrawer-paper": {
+                    width: drawerWidth,
+                    boxSizing: "border-box"
+                }
             }}
         >
-            <h2>Nextalx</h2>
+            <Toolbar>
+                <Typography
+                    variant="h5"
+                    fontWeight="700"
+                    color="primary"
+                >
+                    NEXTALX
+                </Typography>
+            </Toolbar>
 
-            <hr />
+            <Divider />
 
-            <nav
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "15px",
-                    marginTop: "20px"
-                }}
-            >
-                <Link to="/" style={linkStyle}>
-                    Dashboard
-                </Link>
+            <List>
+                {
+                    menuItems.map((item) => (
+                        <ListItem
+                            key={item.text}
+                            disablePadding
+                        >
+                            <ListItemButton
+                                component={Link}
+                                to={item.path}
+                            >
+                                <ListItemIcon>
+                                    {item.icon}
+                                </ListItemIcon>
 
-                <Link to="/employees" style={linkStyle}>
-                    Employees
-                </Link>
-
-                <Link to="/departments" style={linkStyle}>
-                    Departments
-                </Link>
-
-                <Link to="/assets" style={linkStyle}>
-                    Assets
-                </Link>
-
-                <Link to="/categories" style={linkStyle}>
-                    Categories
-                </Link>
-
-                <Link to="/assignments" style={linkStyle}>
-                    Assignments
-                </Link>
-            </nav>
-        </div>
+                                <ListItemText
+                                    primary={item.text}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    ))
+                }
+            </List>
+        </Drawer>
     );
 }
-
-const linkStyle = {
-    color: "white",
-    textDecoration: "none",
-    fontSize: "16px"
-};
 
 export default Sidebar;

@@ -1,11 +1,11 @@
 package com.nextalx.dto.request;
 
-import com.nextalx.enums.AssetStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -15,20 +15,22 @@ public class CreateAssetRequest {
     @NotBlank
     private String assetTag;
 
-    private String serialNumber;
-
     @NotBlank
+    private String name;
+
     private String brand;
 
-    @NotBlank
     private String model;
+
+    private String serialNumber;
 
     private LocalDate purchaseDate;
 
     private LocalDate warrantyEndDate;
 
-    @NotNull
-    private AssetStatus status;
+    private BigDecimal purchasePrice;
+
+    private String supplier;
 
     @NotNull
     private Long categoryId;

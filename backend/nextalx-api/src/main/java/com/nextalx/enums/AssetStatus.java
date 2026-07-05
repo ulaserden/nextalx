@@ -4,8 +4,8 @@ public enum AssetStatus {
 
     AVAILABLE,
     ASSIGNED,
-    MAINTENANCE,
+    IN_REPAIR,
     RETIRED,
-    LOST
-
+    LOST,
+    BROKEN
 }

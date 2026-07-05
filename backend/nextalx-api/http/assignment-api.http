@@ -1,5 +1,9 @@
-### Get Assignments
-GET http://localhost:8080/api/v1/assignments?page=0&size=10
+### ==========================================
+### ASSIGNMENT API TESTS
+### ==========================================
+
+### Get All Assignments
+GET http://localhost:8080/api/v1/assignments?page=0&size=100
 
 ###
 
@@ -10,11 +14,45 @@ Content-Type: application/json
 {
   "employeeId": 1,
   "assetId": 1,
-  "assignedDate": "2026-07-04",
-  "note": "Primary development laptop"
+  "assignedDate": "2026-07-05",
+  "expectedReturnDate": "2027-07-05",
+  "notes": "Primary development laptop assignment."
+}
+
+###
+
+### Create Second Assignment
+POST http://localhost:8080/api/v1/assignments
+Content-Type: application/json
+
+{
+  "employeeId": 2,
+  "assetId": 2,
+  "assignedDate": "2026-07-05",
+  "expectedReturnDate": "2026-12-31",
+  "notes": "QA engineer workstation assignment."
 }
 
 ###
 
 ### Return Asset
-POST http://localhost:8080/api/v1/assignments/1/return
+PUT http://localhost:8080/api/v1/assignments/1/return
+
+###
+
+### Try Assign Already Assigned Asset
+POST http://localhost:8080/api/v1/assignments
+Content-Type: application/json
+
+{
+  "employeeId": 3,
+  "assetId": 1,
+  "assignedDate": "2026-07-05",
+  "expectedReturnDate": "2026-10-01",
+  "notes": "This request should fail because asset is already assigned."
+}
+
+###
+
+### Get Assignments Again
+GET http://localhost:8080/api/v1/assignments?page=0&size=100

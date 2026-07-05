@@ -12,13 +12,20 @@ public class AssignmentResponse {
     private Long id;
 
     private Long employeeId;
+
     private String employeeName;
 
     private Long assetId;
+
     private String assetTag;
 
     private LocalDate assignedDate;
+
+    private LocalDate expectedReturnDate;
+
     private LocalDate returnedDate;
 
     private String note;
+
+    private String status;
 }

@@ -1,0 +1,133 @@
+### ==========================================================
+### NEXTALX ASSIGNMENT MODULE TEST SUITE
+### ==========================================================
+
+@baseUrl=http://localhost:8080/api/v1
+
+##############################################################
+### 1) EMPLOYEES
+##############################################################
+
+### Employee listesini getir
+GET {{baseUrl}}/employees?page=0&size=100
+
+###
+
+##############################################################
+### 2) ASSETS
+##############################################################
+
+### Asset listesini getir
+GET {{baseUrl}}/assets?page=0&size=100
+
+###
+
+##############################################################
+### 3) ASSIGNMENT OLUŞTUR
+##############################################################
+
+POST {{baseUrl}}/assignments
+Content-Type: application/json
+
+{
+  "employeeId": 1,
+  "assetId": 1,
+  "assignedDate": "2026-07-05",
+  "note": "Senior Backend Developer laptop assignment"
+}
+
+###
+
+##############################################################
+### 4) TÜM ASSIGNMENT'LARI GETİR
+##############################################################
+
+GET {{baseUrl}}/assignments?page=0&size=100
+
+###
+
+##############################################################
+### 5) AYNI ASSET'I TEKRAR ATA
+### Beklenen:
+### 409 Asset is already assigned.
+##############################################################
+
+POST {{baseUrl}}/assignments
+Content-Type: application/json
+
+{
+  "employeeId": 2,
+  "assetId": 1,
+  "assignedDate": "2026-07-05",
+  "note": "Should fail because asset already assigned"
+}
+
+###
+
+##############################################################
+### 6) ASSET DURUMUNU KONTROL ET
+### Beklenen:
+### status = ASSIGNED
+##############################################################
+
+GET {{baseUrl}}/assets?page=0&size=100
+
+###
+
+##############################################################
+### 7) ASSET İADE ET
+##############################################################
+
+PUT {{baseUrl}}/assignments/1/return
+
+###
+
+##############################################################
+### 8) ASSIGNMENT DURUMUNU KONTROL ET
+### Beklenen:
+### status = RETURNED
+##############################################################
+
+GET {{baseUrl}}/assignments?page=0&size=100
+
+###
+
+##############################################################
+### 9) ASSET DURUMUNU KONTROL ET
+### Beklenen:
+### status = AVAILABLE
+##############################################################
+
+GET {{baseUrl}}/assets?page=0&size=100
+
+###
+
+##############################################################
+### 10) YENİDEN ATAMA TESTİ
+### Beklenen:
+### Başarılı olmalı çünkü asset iade edildi.
+##############################################################
+
+POST {{baseUrl}}/assignments
+Content-Type: application/json
+
+{
+  "employeeId": 2,
+  "assetId": 1,
+  "assignedDate": "2026-07-06",
+  "note": "Frontend Developer reassignment"
+}
+
+###
+
+##############################################################
+### 11) SON DURUM
+##############################################################
+
+GET {{baseUrl}}/assignments?page=0&size=100
+
+###
+
+GET {{baseUrl}}/assets?page=0&size=100
+
+###

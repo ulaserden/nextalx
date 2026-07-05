@@ -1,120 +1,192 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
+
+import {
+    Box,
+    Button,
+    Typography,
+    CircularProgress
+} from "@mui/material";
 
 import AssetsTable
     from "../features/assets/AssetsTable";
 
+import AssetDialog
+    from "../features/assets/AssetDialog";
+
 import {
-    getAssets
+    getAssets,
+    createAsset,
+    updateAsset,
+    setAssetRepair,
+    setAssetRetired
 } from "../services/assetService";
 
 function AssetsPage() {
 
-    const [assets, setAssets] =
+    const [assets,
+        setAssets] =
         useState([]);
 
-    const [loading, setLoading] =
+    const [loading,
+        setLoading] =
         useState(true);
 
-    const [page, setPage] =
-        useState(0);
+    const [dialogOpen,
+        setDialogOpen] =
+        useState(false);
 
-    const [totalPages, setTotalPages] =
-        useState(0);
+    const [selectedAsset,
+        setSelectedAsset] =
+        useState(null);
+
+    const fetchAssets =
+        async () => {
+
+            const response =
+                await getAssets(
+                    0,
+                    100
+                );
+
+            setAssets(
+                response.content
+            );
+
+            setLoading(
+                false
+            );
+        };
 
     useEffect(() => {
 
-        const fetchAssets =
-            async () => {
-
-                try {
-
-                    const response =
-                        await getAssets(
-                            page,
-                            10
-                        );
-
-                    setAssets(
-                        response.content
-                    );
-
-                    setTotalPages(
-                        response.totalPages
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
-
-                } finally {
-
-                    setLoading(
-                        false
-                    );
-                }
-            };
-
         fetchAssets();
 
-    }, [page]);
+    }, []);
+
+    const handleSubmit =
+        async (data) => {
+
+            if (selectedAsset) {
+
+                await updateAsset(
+                    selectedAsset.id,
+                    data
+                );
+
+            } else {
+
+                await createAsset(
+                    data
+                );
+            }
+
+            setDialogOpen(
+                false
+            );
+
+            setSelectedAsset(
+                null
+            );
+
+            await fetchAssets();
+        };
 
     if (loading) {
-        return <h2>Loading...</h2>;
+
+        return (
+            <CircularProgress />
+        );
     }
 
     return (
-        <div>
+        <Box>
 
-            <h1>
-                Assets
-            </h1>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent:
+                        "space-between",
+                    mb: 3
+                }}
+            >
+                <Typography
+                    variant="h4"
+                >
+                    Assets
+                </Typography>
+
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        setDialogOpen(
+                            true
+                        )
+                    }
+                >
+                    Add Asset
+                </Button>
+            </Box>
 
             <AssetsTable
                 assets={assets}
+                onEdit={(asset) => {
+
+                    setSelectedAsset(
+                        asset
+                    );
+
+                    setDialogOpen(
+                        true
+                    );
+                }}
+                onRepair={
+                    async asset => {
+
+                        await setAssetRepair(
+                            asset.id
+                        );
+
+                        fetchAssets();
+                    }
+                }
+                onRetire={
+                    async asset => {
+
+                        await setAssetRetired(
+                            asset.id
+                        );
+
+                        fetchAssets();
+                    }
+                }
             />
 
-            <div
-                style={{
-                    marginTop: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px"
+            <AssetDialog
+                open={
+                    dialogOpen
+                }
+                asset={
+                    selectedAsset
+                }
+                onClose={() => {
+
+                    setDialogOpen(
+                        false
+                    );
+
+                    setSelectedAsset(
+                        null
+                    );
                 }}
-            >
-                <button
-                    disabled={
-                        page === 0
-                    }
-                    onClick={() =>
-                        setPage(
-                            page - 1
-                        )
-                    }
-                >
-                    Previous
-                </button>
+                onSubmit={
+                    handleSubmit
+                }
+            />
 
-                <span>
-                    Page {page + 1} / {totalPages}
-                </span>
-
-                <button
-                    disabled={
-                        page + 1 >= totalPages
-                    }
-                    onClick={() =>
-                        setPage(
-                            page + 1
-                        )
-                    }
-                >
-                    Next
-                </button>
-            </div>
-
-        </div>
+        </Box>
     );
 }
 

@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 
+import {
+    Box,
+    CircularProgress,
+    Typography
+} from "@mui/material";
+
 import AssignmentsTable
     from "../features/assignments/AssignmentsTable";
 
@@ -9,120 +15,68 @@ import {
 
 function AssignmentsPage() {
 
-    const [assignments,
-        setAssignments] =
-        useState([]);
-
-    const [loading,
-        setLoading] =
-        useState(true);
-
-    const [page,
-        setPage] =
-        useState(0);
-
-    const [totalPages,
-        setTotalPages] =
-        useState(0);
+    const [assignments, setAssignments] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
 
-        const fetchAssignments =
-            async () => {
+        const fetchAssignments = async () => {
 
-                try {
+            try {
 
-                    const response =
-                        await getAssignments(
-                            page,
-                            10
-                        );
+                const response = await getAssignments(
+                    0,
+                    100
+                );
 
-                    setAssignments(
-                        response.content
-                    );
+                setAssignments(
+                    response.content
+                );
 
-                    setTotalPages(
-                        response.totalPages
-                    );
+            } catch (error) {
 
-                } catch (error) {
+                console.error(error);
 
-                    console.error(
-                        error
-                    );
+            } finally {
 
-                } finally {
-
-                    setLoading(
-                        false
-                    );
-                }
-            };
+                setLoading(false);
+            }
+        };
 
         fetchAssignments();
 
-    }, [page]);
+    }, []);
 
     if (loading) {
-        return <h2>Loading...</h2>;
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mt: 5
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
     }
 
     return (
-        <div>
-
-            <h1>
-                Assignments
-            </h1>
-
-            <AssignmentsTable
-                assignments={
-                    assignments
-                }
-            />
-
-            <div
-                style={{
-                    marginTop: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px"
+        <Box>
+            <Typography
+                variant="h4"
+                sx={{
+                    mb: 3,
+                    fontWeight: 600
                 }}
             >
-                <button
-                    disabled={
-                        page === 0
-                    }
-                    onClick={() =>
-                        setPage(
-                            page - 1
-                        )
-                    }
-                >
-                    Previous
-                </button>
+                Assignments
+            </Typography>
 
-                <span>
-                    Page {page + 1}
-                    {" / "}
-                    {totalPages}
-                </span>
-
-                <button
-                    disabled={
-                        page + 1 >= totalPages
-                    }
-                    onClick={() =>
-                        setPage(
-                            page + 1
-                        )
-                    }
-                >
-                    Next
-                </button>
-            </div>
-
-        </div>
+            <AssignmentsTable
+                assignments={assignments}
+            />
+        </Box>
     );
 }
 

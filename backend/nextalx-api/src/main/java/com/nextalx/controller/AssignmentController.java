@@ -27,7 +27,6 @@ public class AssignmentController {
                     defaultValue = "10"
             )
             int size
-
     ) {
 
         return assignmentService.getAllAssignments(
@@ -48,7 +47,7 @@ public class AssignmentController {
         );
     }
 
-    @PostMapping("/{id}/return")
+    @PutMapping("/{id}/return")
     public AssignmentResponse returnAsset(
             @PathVariable Long id
     ) {

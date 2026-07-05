@@ -1,0 +1,76 @@
+### ============================================
+### NEXTALX ASSIGNMENT FLOW TEST
+### ============================================
+
+
+### 1) Mevcut çalışanları listele
+GET http://localhost:8080/api/v1/employees?page=0&size=100
+
+###
+
+### 2) Mevcut kategorileri listele
+GET http://localhost:8080/api/v1/categories?page=0&size=100
+
+###
+
+### 3) Asset oluştur
+POST http://localhost:8080/api/v1/assets
+Content-Type: application/json
+
+{
+  "assetTag": "LT-001",
+  "name": "MacBook Pro 16",
+  "brand": "Apple",
+  "model": "M4 Pro",
+  "serialNumber": "APL-2026-001",
+  "purchaseDate": "2026-01-01",
+  "warrantyEndDate": "2029-01-01",
+  "purchasePrice": 125000,
+  "supplier": "Apple Türkiye",
+  "categoryId": 1
+}
+
+###
+
+### 4) Asset listesini kontrol et
+GET http://localhost:8080/api/v1/assets?page=0&size=100
+
+###
+
+### 5) Asset'i çalışana ata
+POST http://localhost:8080/api/v1/assignments
+Content-Type: application/json
+
+{
+  "employeeId": 1,
+  "assetId": 1,
+  "assignedDate": "2026-07-05",
+  "note": "Senior Backend Developer laptop assignment"
+}
+
+###
+
+### 6) Assignment listesini getir
+GET http://localhost:8080/api/v1/assignments?page=0&size=100
+
+###
+
+### 7) Asset durumunun ASSIGNED olduğunu doğrula
+GET http://localhost:8080/api/v1/assets?page=0&size=100
+
+###
+
+### 8) Asset'i geri teslim al
+PUT http://localhost:8080/api/v1/assignments/1/return
+
+###
+
+### 9) Assignment listesini tekrar kontrol et
+GET http://localhost:8080/api/v1/assignments?page=0&size=100
+
+###
+
+### 10) Asset tekrar AVAILABLE oldu mu kontrol et
+GET http://localhost:8080/api/v1/assets?page=0&size=100
+
+###

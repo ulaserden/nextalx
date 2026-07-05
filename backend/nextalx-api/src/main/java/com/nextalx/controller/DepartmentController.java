@@ -1,6 +1,7 @@
 package com.nextalx.controller;
 
 import com.nextalx.dto.request.CreateDepartmentRequest;
+import com.nextalx.dto.request.UpdateDepartmentRequest;
 import com.nextalx.dto.response.DepartmentResponse;
 import com.nextalx.service.DepartmentService;
 import jakarta.validation.Valid;
@@ -45,6 +46,41 @@ public class DepartmentController {
 
         return departmentService.createDepartment(
                 request
+        );
+    }
+
+    @PutMapping("/{id}")
+    public DepartmentResponse updateDepartment(
+            @PathVariable Long id,
+
+            @Valid
+            @RequestBody
+            UpdateDepartmentRequest request
+    ) {
+
+        return departmentService.updateDepartment(
+                id,
+                request
+        );
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public DepartmentResponse deactivateDepartment(
+            @PathVariable Long id
+    ) {
+
+        return departmentService.deactivateDepartment(
+                id
+        );
+    }
+
+    @PatchMapping("/{id}/activate")
+    public DepartmentResponse activateDepartment(
+            @PathVariable Long id
+    ) {
+
+        return departmentService.activateDepartment(
+                id
         );
     }
 }

@@ -1,87 +1,158 @@
-function getStatusBadge(status) {
+import {
+    DataGrid
+} from "@mui/x-data-grid";
 
-    const style = {
-        padding: "6px 12px",
-        borderRadius: "20px",
-        fontSize: "12px",
-        fontWeight: "bold"
-    };
+import {
+    Paper,
+    IconButton,
+    Stack
+} from "@mui/material";
 
-    if (status === "AVAILABLE") {
-        return (
-            <span
-                style={{
-                    ...style,
-                    backgroundColor: "#dcfce7",
-                    color: "#166534"
-                }}
-            >
-                Available
-            </span>
-        );
-    }
+import EditIcon
+    from "@mui/icons-material/Edit";
 
-    return (
-        <span
-            style={{
-                ...style,
-                backgroundColor: "#fee2e2",
-                color: "#991b1b"
-            }}
-        >
-            Assigned
-        </span>
-    );
-}
+import BuildIcon
+    from "@mui/icons-material/Build";
+
+import DeleteForeverIcon
+    from "@mui/icons-material/DeleteForever";
 
 function AssetsTable({
-    assets
+    assets,
+    onEdit,
+    onRepair,
+    onRetire
 }) {
 
+    const columns = [
+
+        {
+            field: "assetTag",
+            headerName: "Asset Tag",
+            width: 120
+        },
+
+        {
+            field: "name",
+            headerName: "Name",
+            flex: 1.3
+        },
+
+        {
+            field: "brand",
+            headerName: "Brand",
+            flex: 1
+        },
+
+        {
+            field: "model",
+            headerName: "Model",
+            flex: 1
+        },
+
+        {
+            field: "serialNumber",
+            headerName: "Serial Number",
+            flex: 1.2
+        },
+
+        {
+            field: "categoryName",
+            headerName: "Category",
+            flex: 1
+        },
+
+        {
+            field: "supplier",
+            headerName: "Supplier",
+            flex: 1
+        },
+
+        {
+            field: "purchasePrice",
+            headerName: "Price",
+            flex: 0.8
+        },
+
+        {
+            field: "status",
+            headerName: "Status",
+            flex: 1
+        },
+
+        {
+            field: "actions",
+            headerName: "Actions",
+            width: 170,
+
+            renderCell: (params) => (
+
+                <Stack
+                    direction="row"
+                    spacing={1}
+                >
+
+                    <IconButton
+                        onClick={() =>
+                            onEdit(
+                                params.row
+                            )
+                        }
+                    >
+                        <EditIcon />
+                    </IconButton>
+
+                    <IconButton
+                        onClick={() =>
+                            onRepair(
+                                params.row
+                            )
+                        }
+                    >
+                        <BuildIcon />
+                    </IconButton>
+
+                    <IconButton
+                        onClick={() =>
+                            onRetire(
+                                params.row
+                            )
+                        }
+                    >
+                        <DeleteForeverIcon />
+                    </IconButton>
+
+                </Stack>
+            )
+        }
+    ];
+
     return (
-        <table
-            style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                background: "white"
+        <Paper
+            elevation={3}
+            sx={{
+                width: "100%"
             }}
         >
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Asset Tag</th>
-                    <th>Brand</th>
-                    <th>Model</th>
-                    <th>Status</th>
-                    <th>Category</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {
-                    assets.map(asset => (
-                        <tr key={asset.id}>
-                            <td>{asset.id}</td>
-                            <td>{asset.assetTag}</td>
-                            <td>{asset.brand}</td>
-                            <td>{asset.model}</td>
-
-                            <td>
-                                {
-                                    getStatusBadge(
-                                        asset.status
-                                    )
-                                }
-                            </td>
-
-                            <td>
-                                {asset.categoryName}
-                            </td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-        </table>
+            <DataGrid
+                rows={assets}
+                columns={columns}
+                autoHeight
+                disableRowSelectionOnClick
+                pageSizeOptions={[
+                    5,
+                    10,
+                    25
+                ]}
+                initialState={{
+                    pagination: {
+                        paginationModel: {
+                            pageSize: 10
+                        }
+                    }
+                }}
+            />
+        </Paper>
     );
 }
 

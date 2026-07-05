@@ -1,0 +1,8 @@
+POST http://localhost:8080/api/v1/assignments
+Content-Type: application/json
+
+{
+  "employeeId": 4,
+  "assetId": 2,
+  "assignedDate": "2026-07-05"
+}

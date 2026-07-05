@@ -1,102 +1,357 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
 
-import EmployeesTable from "../features/employees/EmployeesTable";
-import { getEmployees } from "../services/employeeService";
+import {
+    Alert,
+    Box,
+    Button,
+    CircularProgress,
+    Snackbar,
+    Typography
+} from "@mui/material";
+
+import EmployeesTable
+    from "../features/employees/EmployeesTable";
+
+import EmployeeDialog
+    from "../features/employees/EmployeeDialog";
+
+import {
+    createEmployee,
+    getEmployees,
+    updateEmployee,
+    activateEmployee,
+    deactivateEmployee
+} from "../services/employeeService";
 
 function EmployeesPage() {
 
-    const [employees, setEmployees] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [employees, setEmployees] =
+        useState([]);
 
-    const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+    const [loading, setLoading] =
+        useState(true);
 
-    useEffect(() => {
+    const [dialogOpen, setDialogOpen] =
+        useState(false);
 
-        const fetchEmployees = async () => {
+    const [selectedEmployee,
+        setSelectedEmployee] =
+        useState(null);
+
+    const [snackbar, setSnackbar] =
+        useState({
+            open: false,
+            message: "",
+            severity: "success"
+        });
+
+    const showSnackbar = (
+        message,
+        severity = "success"
+    ) => {
+
+        setSnackbar({
+            open: true,
+            message,
+            severity
+        });
+    };
+
+    const handleCloseSnackbar =
+        () => {
+
+            setSnackbar(
+                previous => ({
+                    ...previous,
+                    open: false
+                })
+            );
+        };
+
+    const fetchEmployees =
+        async () => {
 
             try {
 
-                const response = await getEmployees(
-                        page,
-                        10
-                );
+                const response =
+                    await getEmployees(
+                        0,
+                        100
+                    );
 
                 setEmployees(
-                        response.content
-                );
-
-                setTotalPages(
-                        response.totalPages
+                    response.content
                 );
 
             } catch (error) {
 
-                console.error(
-                        error
+                console.error(error);
+
+                showSnackbar(
+                    "Employees could not be loaded.",
+                    "error"
                 );
 
             } finally {
 
-                setLoading(
-                        false
+                setLoading(false);
+            }
+        };
+
+    useEffect(() => {
+
+        fetchEmployees();
+
+    }, []);
+
+    const handleCreateEmployee =
+        async (employeeData) => {
+
+            try {
+
+                await createEmployee(
+                    employeeData
+                );
+
+                setDialogOpen(
+                    false
+                );
+
+                await fetchEmployees();
+
+                showSnackbar(
+                    "Employee created successfully."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Employee could not be created.",
+                    "error"
                 );
             }
         };
 
-        fetchEmployees();
+    const handleUpdateEmployee =
+        async (employeeData) => {
 
-    }, [page]);
+            try {
+
+                await updateEmployee(
+                    selectedEmployee.id,
+                    employeeData
+                );
+
+                setDialogOpen(
+                    false
+                );
+
+                setSelectedEmployee(
+                    null
+                );
+
+                await fetchEmployees();
+
+                showSnackbar(
+                    "Employee updated successfully."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Employee could not be updated.",
+                    "error"
+                );
+            }
+        };
+
+    const handleDeactivateEmployee =
+        async (employee) => {
+
+            const confirmed =
+                window.confirm(
+                    `${employee.firstName} ${employee.lastName} çalışanını pasife almak istiyor musunuz?`
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+
+                await deactivateEmployee(
+                    employee.id
+                );
+
+                await fetchEmployees();
+
+                showSnackbar(
+                    "Employee deactivated successfully."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Employee could not be deactivated.",
+                    "error"
+                );
+            }
+        };
+
+    const handleActivateEmployee =
+        async (employee) => {
+
+            try {
+
+                await activateEmployee(
+                    employee.id
+                );
+
+                await fetchEmployees();
+
+                showSnackbar(
+                    "Employee activated successfully."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showSnackbar(
+                    "Employee could not be activated.",
+                    "error"
+                );
+            }
+        };
 
     if (loading) {
-        return <h2>Loading...</h2>;
+
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mt: 5
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
     }
 
     return (
-            <div>
+        <Box>
 
-                <h1>
-                    Employees
-                </h1>
-
-                <EmployeesTable
-                        employees={employees}
-                />
-
-                <div
-                        style={{
-                            marginTop: "20px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px"
-                        }}
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent:
+                        "space-between",
+                    alignItems: "center",
+                    mb: 3
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    fontWeight={600}
                 >
-                    <button
-                            disabled={page === 0}
-                            onClick={() =>
-                                    setPage(page - 1)
-                            }
-                    >
-                        Previous
-                    </button>
+                    Employees
+                </Typography>
 
-                    <span>
-                        Page {page + 1} / {totalPages}
-                    </span>
+                <Button
+                    variant="contained"
+                    onClick={() => {
 
-                    <button
-                            disabled={
-                                    page + 1 >= totalPages
-                            }
-                            onClick={() =>
-                                    setPage(page + 1)
-                            }
-                    >
-                        Next
-                    </button>
-                </div>
+                        setSelectedEmployee(
+                            null
+                        );
 
-            </div>
+                        setDialogOpen(
+                            true
+                        );
+                    }}
+                >
+                    Add Employee
+                </Button>
+            </Box>
+
+            <EmployeesTable
+                employees={employees}
+                onEdit={(employee) => {
+
+                    setSelectedEmployee(
+                        employee
+                    );
+
+                    setDialogOpen(
+                        true
+                    );
+                }}
+                onDeactivate={
+                    handleDeactivateEmployee
+                }
+                onActivate={
+                    handleActivateEmployee
+                }
+            />
+
+            <EmployeeDialog
+                open={dialogOpen}
+                employee={
+                    selectedEmployee
+                }
+                onClose={() => {
+
+                    setDialogOpen(
+                        false
+                    );
+
+                    setSelectedEmployee(
+                        null
+                    );
+                }}
+                onSubmit={
+                    selectedEmployee
+                        ? handleUpdateEmployee
+                        : handleCreateEmployee
+                }
+            />
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right"
+                }}
+            >
+                <Alert
+                    severity={
+                        snackbar.severity
+                    }
+                    onClose={
+                        handleCloseSnackbar
+                    }
+                    variant="filled"
+                    sx={{
+                        width: "100%"
+                    }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+
+        </Box>
     );
 }
 
