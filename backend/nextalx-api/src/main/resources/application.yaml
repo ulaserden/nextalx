@@ -3,9 +3,9 @@ spring:
     name: nextalx-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/nextalx
-    username: postgres
-    password: postgre
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/nextalx}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgre}
 
   jpa:
     hibernate:
