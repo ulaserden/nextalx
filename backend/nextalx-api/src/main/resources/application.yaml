@@ -3,14 +3,14 @@ spring:
     name: nextalx-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/nextalx
-    username: postgres
-    password: postgre
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/nextalx}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgre}
 
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: ${JPA_SHOW_SQL:true}
     open-in-view: false
 
     properties:
@@ -20,3 +20,6 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+server:
+  port: ${PORT:8080}
