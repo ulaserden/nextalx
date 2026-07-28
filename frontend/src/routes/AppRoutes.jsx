@@ -1,32 +1,51 @@
+import { lazy, Suspense } from "react";
+
 import {
     BrowserRouter,
     Routes,
     Route
 } from "react-router-dom";
 
+import { Box, CircularProgress } from "@mui/material";
+
 import MainLayout
     from "../layouts/MainLayout";
 
-import DashboardPage
-    from "../pages/DashboardPage";
+const DashboardPage =
+    lazy(() => import("../pages/DashboardPage"));
 
-import EmployeesPage
-    from "../pages/EmployeesPage";
+const EmployeesPage =
+    lazy(() => import("../pages/EmployeesPage"));
 
-import DepartmentsPage
-    from "../pages/DepartmentsPage";
+const DepartmentsPage =
+    lazy(() => import("../pages/DepartmentsPage"));
 
-import CategoriesPage
-    from "../pages/CategoriesPage";
+const CategoriesPage =
+    lazy(() => import("../pages/CategoriesPage"));
 
-import AssetsPage
-    from "../pages/AssetsPage";
+const AssetsPage =
+    lazy(() => import("../pages/AssetsPage"));
 
-import AssignmentsPage
-    from "../pages/AssignmentsPage";
+const AssignmentsPage =
+    lazy(() => import("../pages/AssignmentsPage"));
 
-import NotFoundPage
-    from "../pages/NotFoundPage";
+const NotFoundPage =
+    lazy(() => import("../pages/NotFoundPage"));
+
+function PageFallback() {
+
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                justifyContent: "center",
+                mt: 5
+            }}
+        >
+            <CircularProgress />
+        </Box>
+    );
+}
 
 function AppRoutes() {
 
@@ -44,49 +63,63 @@ function AppRoutes() {
                     <Route
                         path="/"
                         element={
-                            <DashboardPage />
+                            <Suspense fallback={<PageFallback />}>
+                                <DashboardPage />
+                            </Suspense>
                         }
                     />
 
                     <Route
                         path="/employees"
                         element={
-                            <EmployeesPage />
+                            <Suspense fallback={<PageFallback />}>
+                                <EmployeesPage />
+                            </Suspense>
                         }
                     />
 
                     <Route
                         path="/departments"
                         element={
-                            <DepartmentsPage />
+                            <Suspense fallback={<PageFallback />}>
+                                <DepartmentsPage />
+                            </Suspense>
                         }
                     />
 
                     <Route
                         path="/categories"
                         element={
-                            <CategoriesPage />
+                            <Suspense fallback={<PageFallback />}>
+                                <CategoriesPage />
+                            </Suspense>
                         }
                     />
 
                     <Route
                         path="/assets"
                         element={
-                            <AssetsPage />
+                            <Suspense fallback={<PageFallback />}>
+                                <AssetsPage />
+                            </Suspense>
                         }
                     />
 
                     <Route
                         path="/assignments"
                         element={
-                            <AssignmentsPage />
+                            <Suspense fallback={<PageFallback />}>
+                                <AssignmentsPage />
+                            </Suspense>
                         }
                     />
 
                     <Route
                         path="*"
                         element={
-                            <NotFoundPage />
+                            <Suspense fallback={<PageFallback />}>
+                                <NotFoundPage />
+                            </Suspense>
                         }
                     />
 
