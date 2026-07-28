@@ -4,13 +4,13 @@ import {
 } from "react";
 
 import {
-    Alert,
     Box,
     Button,
     CircularProgress,
-    Snackbar,
     Typography
 } from "@mui/material";
+
+import toast from "react-hot-toast";
 
 import DepartmentsTable
     from "../features/departments/DepartmentsTable";
@@ -41,36 +41,6 @@ function DepartmentsPage() {
         setSelectedDepartment] =
         useState(null);
 
-    const [snackbar, setSnackbar] =
-        useState({
-            open: false,
-            message: "",
-            severity: "success"
-        });
-
-    const showSnackbar = (
-        message,
-        severity = "success"
-    ) => {
-
-        setSnackbar({
-            open: true,
-            message,
-            severity
-        });
-    };
-
-    const handleCloseSnackbar =
-        () => {
-
-            setSnackbar(
-                previous => ({
-                    ...previous,
-                    open: false
-                })
-            );
-        };
-
     const fetchDepartments =
         async () => {
 
@@ -88,11 +58,9 @@ function DepartmentsPage() {
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Departments could not be loaded.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Departments could not be loaded."
                 );
 
             } finally {
@@ -116,23 +84,19 @@ function DepartmentsPage() {
                     departmentData
                 );
 
-                setDialogOpen(
-                    false
-                );
+                setDialogOpen(false);
 
                 await fetchDepartments();
 
-                showSnackbar(
+                toast.success(
                     "Department created successfully."
                 );
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Department could not be created.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Department could not be created."
                 );
             }
         };
@@ -147,27 +111,21 @@ function DepartmentsPage() {
                     departmentData
                 );
 
-                setDialogOpen(
-                    false
-                );
+                setDialogOpen(false);
 
-                setSelectedDepartment(
-                    null
-                );
+                setSelectedDepartment(null);
 
                 await fetchDepartments();
 
-                showSnackbar(
+                toast.success(
                     "Department updated successfully."
                 );
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Department could not be updated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Department could not be updated."
                 );
             }
         };
@@ -177,7 +135,7 @@ function DepartmentsPage() {
 
             const confirmed =
                 window.confirm(
-                    `${department.name} departmanını pasife almak istiyor musunuz?`
+                    `Deactivate department "${department.name}"?`
                 );
 
             if (!confirmed) {
@@ -192,17 +150,15 @@ function DepartmentsPage() {
 
                 await fetchDepartments();
 
-                showSnackbar(
+                toast.success(
                     "Department deactivated successfully."
                 );
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Department could not be deactivated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Department could not be deactivated."
                 );
             }
         };
@@ -218,17 +174,15 @@ function DepartmentsPage() {
 
                 await fetchDepartments();
 
-                showSnackbar(
+                toast.success(
                     "Department activated successfully."
                 );
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Department could not be activated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Department could not be activated."
                 );
             }
         };
@@ -254,19 +208,17 @@ function DepartmentsPage() {
             <Box
                 sx={{
                     display: "flex",
-                    justifyContent:
-                        "space-between",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
                     mb: 3
                 }}
             >
                 <Typography
                     variant="h4"
-                    sx={{
-                    
-                    color: "text.primary"
-                }}
                     fontWeight={600}
+                    color="text.primary"
                 >
                     Departments
                 </Typography>
@@ -275,13 +227,9 @@ function DepartmentsPage() {
                     variant="contained"
                     onClick={() => {
 
-                        setSelectedDepartment(
-                            null
-                        );
+                        setSelectedDepartment(null);
 
-                        setDialogOpen(
-                            true
-                        );
+                        setDialogOpen(true);
                     }}
                 >
                     Add Department
@@ -292,13 +240,9 @@ function DepartmentsPage() {
                 departments={departments}
                 onEdit={(department) => {
 
-                    setSelectedDepartment(
-                        department
-                    );
+                    setSelectedDepartment(department);
 
-                    setDialogOpen(
-                        true
-                    );
+                    setDialogOpen(true);
                 }}
                 onDeactivate={
                     handleDeactivateDepartment
@@ -310,18 +254,12 @@ function DepartmentsPage() {
 
             <DepartmentDialog
                 open={dialogOpen}
-                department={
-                    selectedDepartment
-                }
+                department={selectedDepartment}
                 onClose={() => {
 
-                    setDialogOpen(
-                        false
-                    );
+                    setDialogOpen(false);
 
-                    setSelectedDepartment(
-                        null
-                    );
+                    setSelectedDepartment(null);
                 }}
                 onSubmit={
                     selectedDepartment
@@ -329,31 +267,6 @@ function DepartmentsPage() {
                         : handleCreateDepartment
                 }
             />
-
-            <Snackbar
-                open={snackbar.open}
-                autoHideDuration={4000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right"
-                }}
-            >
-                <Alert
-                    severity={
-                        snackbar.severity
-                    }
-                    onClose={
-                        handleCloseSnackbar
-                    }
-                    variant="filled"
-                    sx={{
-                        width: "100%"
-                    }}
-                >
-                    {snackbar.message}
-                </Alert>
-            </Snackbar>
 
         </Box>
     );

@@ -4,13 +4,13 @@ import {
 } from "react";
 
 import {
-    Alert,
     Box,
     Button,
     CircularProgress,
-    Snackbar,
     Typography
 } from "@mui/material";
+
+import toast from "react-hot-toast";
 
 import EmployeesTable
     from "../features/employees/EmployeesTable";
@@ -41,36 +41,6 @@ function EmployeesPage() {
         setSelectedEmployee] =
         useState(null);
 
-    const [snackbar, setSnackbar] =
-        useState({
-            open: false,
-            message: "",
-            severity: "success"
-        });
-
-    const showSnackbar = (
-        message,
-        severity = "success"
-    ) => {
-
-        setSnackbar({
-            open: true,
-            message,
-            severity
-        });
-    };
-
-    const handleCloseSnackbar =
-        () => {
-
-            setSnackbar(
-                previous => ({
-                    ...previous,
-                    open: false
-                })
-            );
-        };
-
     const fetchEmployees =
         async () => {
 
@@ -88,11 +58,9 @@ function EmployeesPage() {
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Employees could not be loaded.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Employees could not be loaded."
                 );
 
             } finally {
@@ -116,23 +84,19 @@ function EmployeesPage() {
                     employeeData
                 );
 
-                setDialogOpen(
-                    false
-                );
+                setDialogOpen(false);
 
                 await fetchEmployees();
 
-                showSnackbar(
+                toast.success(
                     "Employee created successfully."
                 );
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Employee could not be created.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Employee could not be created."
                 );
             }
         };
@@ -147,27 +111,21 @@ function EmployeesPage() {
                     employeeData
                 );
 
-                setDialogOpen(
-                    false
-                );
+                setDialogOpen(false);
 
-                setSelectedEmployee(
-                    null
-                );
+                setSelectedEmployee(null);
 
                 await fetchEmployees();
 
-                showSnackbar(
+                toast.success(
                     "Employee updated successfully."
                 );
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Employee could not be updated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Employee could not be updated."
                 );
             }
         };
@@ -177,7 +135,7 @@ function EmployeesPage() {
 
             const confirmed =
                 window.confirm(
-                    `${employee.firstName} ${employee.lastName} çalışanını pasife almak istiyor musunuz?`
+                    `Deactivate employee "${employee.firstName} ${employee.lastName}"?`
                 );
 
             if (!confirmed) {
@@ -192,17 +150,15 @@ function EmployeesPage() {
 
                 await fetchEmployees();
 
-                showSnackbar(
+                toast.success(
                     "Employee deactivated successfully."
                 );
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Employee could not be deactivated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Employee could not be deactivated."
                 );
             }
         };
@@ -218,17 +174,15 @@ function EmployeesPage() {
 
                 await fetchEmployees();
 
-                showSnackbar(
+                toast.success(
                     "Employee activated successfully."
                 );
 
             } catch (error) {
 
-                console.error(error);
-
-                showSnackbar(
-                    "Employee could not be activated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Employee could not be activated."
                 );
             }
         };
@@ -254,36 +208,28 @@ function EmployeesPage() {
             <Box
                 sx={{
                     display: "flex",
-                    justifyContent:
-                        "space-between",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
                     mb: 3
                 }}
             >
                 <Typography
                     variant="h4"
-                    sx={{
-                    
-                    color: "text.primary"
-                }}
                     fontWeight={600}
-                    
+                    color="text.primary"
                 >
                     Employees
-                    
                 </Typography>
 
                 <Button
                     variant="contained"
                     onClick={() => {
 
-                        setSelectedEmployee(
-                            null
-                        );
+                        setSelectedEmployee(null);
 
-                        setDialogOpen(
-                            true
-                        );
+                        setDialogOpen(true);
                     }}
                 >
                     Add Employee
@@ -294,13 +240,9 @@ function EmployeesPage() {
                 employees={employees}
                 onEdit={(employee) => {
 
-                    setSelectedEmployee(
-                        employee
-                    );
+                    setSelectedEmployee(employee);
 
-                    setDialogOpen(
-                        true
-                    );
+                    setDialogOpen(true);
                 }}
                 onDeactivate={
                     handleDeactivateEmployee
@@ -312,18 +254,12 @@ function EmployeesPage() {
 
             <EmployeeDialog
                 open={dialogOpen}
-                employee={
-                    selectedEmployee
-                }
+                employee={selectedEmployee}
                 onClose={() => {
 
-                    setDialogOpen(
-                        false
-                    );
+                    setDialogOpen(false);
 
-                    setSelectedEmployee(
-                        null
-                    );
+                    setSelectedEmployee(null);
                 }}
                 onSubmit={
                     selectedEmployee
@@ -331,31 +267,6 @@ function EmployeesPage() {
                         : handleCreateEmployee
                 }
             />
-
-            <Snackbar
-                open={snackbar.open}
-                autoHideDuration={4000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right"
-                }}
-            >
-                <Alert
-                    severity={
-                        snackbar.severity
-                    }
-                    onClose={
-                        handleCloseSnackbar
-                    }
-                    variant="filled"
-                    sx={{
-                        width: "100%"
-                    }}
-                >
-                    {snackbar.message}
-                </Alert>
-            </Snackbar>
 
         </Box>
     );

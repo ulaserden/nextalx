@@ -4,13 +4,13 @@ import {
 } from "react";
 
 import {
-    Alert,
     Box,
     Button,
     CircularProgress,
-    Snackbar,
     Typography
 } from "@mui/material";
+
+import toast from "react-hot-toast";
 
 import CategoriesTable
     from "../features/categories/CategoriesTable";
@@ -41,13 +41,6 @@ function CategoriesPage() {
         setSelectedCategory] =
         useState(null);
 
-    const [snackbar, setSnackbar] =
-        useState({
-            open: false,
-            message: "",
-            severity: "success"
-        });
-
     const fetchCategories =
         async () => {
 
@@ -65,7 +58,10 @@ function CategoriesPage() {
 
             } catch (error) {
 
-                console.error(error);
+                toast.error(
+                    error?.userMessage ||
+                    "Categories could not be loaded."
+                );
 
             } finally {
 
@@ -78,19 +74,6 @@ function CategoriesPage() {
         fetchCategories();
 
     }, []);
-
-    const showSnackbar =
-        (
-            message,
-            severity = "success"
-        ) => {
-
-            setSnackbar({
-                open: true,
-                message,
-                severity
-            });
-        };
 
     const handleCreateCategory =
         async (categoryData) => {
@@ -105,15 +88,15 @@ function CategoriesPage() {
 
                 await fetchCategories();
 
-                showSnackbar(
+                toast.success(
                     "Category created successfully."
                 );
 
             } catch (error) {
 
-                showSnackbar(
-                    "Category could not be created.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Category could not be created."
                 );
             }
         };
@@ -130,21 +113,19 @@ function CategoriesPage() {
 
                 setDialogOpen(false);
 
-                setSelectedCategory(
-                    null
-                );
+                setSelectedCategory(null);
 
                 await fetchCategories();
 
-                showSnackbar(
+                toast.success(
                     "Category updated successfully."
                 );
 
             } catch (error) {
 
-                showSnackbar(
-                    "Category could not be updated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Category could not be updated."
                 );
             }
         };
@@ -160,15 +141,15 @@ function CategoriesPage() {
 
                 await fetchCategories();
 
-                showSnackbar(
+                toast.success(
                     "Category deactivated successfully."
                 );
 
             } catch (error) {
 
-                showSnackbar(
-                    "Category could not be deactivated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Category could not be deactivated."
                 );
             }
         };
@@ -184,15 +165,15 @@ function CategoriesPage() {
 
                 await fetchCategories();
 
-                showSnackbar(
+                toast.success(
                     "Category activated successfully."
                 );
 
             } catch (error) {
 
-                showSnackbar(
-                    "Category could not be activated.",
-                    "error"
+                toast.error(
+                    error?.userMessage ||
+                    "Category could not be activated."
                 );
             }
         };
@@ -203,8 +184,7 @@ function CategoriesPage() {
             <Box
                 sx={{
                     display: "flex",
-                    justifyContent:
-                        "center",
+                    justifyContent: "center",
                     mt: 5
                 }}
             >
@@ -219,19 +199,17 @@ function CategoriesPage() {
             <Box
                 sx={{
                     display: "flex",
-                    justifyContent:
-                        "space-between",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
                     mb: 3
                 }}
             >
                 <Typography
                     variant="h4"
-                    sx={{
-                    
-                    color: "text.primary"
-                }}
                     fontWeight={600}
+                    color="text.primary"
                 >
                     Categories
                 </Typography>
@@ -240,9 +218,7 @@ function CategoriesPage() {
                     variant="contained"
                     onClick={() => {
 
-                        setSelectedCategory(
-                            null
-                        );
+                        setSelectedCategory(null);
 
                         setDialogOpen(true);
                     }}
@@ -255,9 +231,7 @@ function CategoriesPage() {
                 categories={categories}
                 onEdit={(category) => {
 
-                    setSelectedCategory(
-                        category
-                    );
+                    setSelectedCategory(category);
 
                     setDialogOpen(true);
                 }}
@@ -276,9 +250,7 @@ function CategoriesPage() {
 
                     setDialogOpen(false);
 
-                    setSelectedCategory(
-                        null
-                    );
+                    setSelectedCategory(null);
                 }}
                 onSubmit={
                     selectedCategory
@@ -286,28 +258,6 @@ function CategoriesPage() {
                         : handleCreateCategory
                 }
             />
-
-            <Snackbar
-                open={snackbar.open}
-                autoHideDuration={4000}
-                onClose={() =>
-                    setSnackbar({
-                        ...snackbar,
-                        open: false
-                    })
-                }
-            >
-                <Alert
-                    severity={
-                        snackbar.severity
-                    }
-                    variant="filled"
-                >
-                    {
-                        snackbar.message
-                    }
-                </Alert>
-            </Snackbar>
 
         </Box>
     );
