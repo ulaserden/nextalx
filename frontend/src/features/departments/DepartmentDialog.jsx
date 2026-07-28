@@ -4,7 +4,9 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    TextField
+    TextField,
+    useMediaQuery,
+    useTheme
 } from "@mui/material";
 
 import {
@@ -18,6 +20,9 @@ function DepartmentDialog({
     onSubmit,
     department
 }) {
+
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [formData, setFormData] =
         useState({
@@ -66,6 +71,7 @@ function DepartmentDialog({
 
     return (
         <Dialog
+            fullScreen={fullScreen}
             open={open}
             onClose={onClose}
             fullWidth
