@@ -30,8 +30,9 @@ This guide describes how to deploy Nextalx to **Railway** as three services in o
 ## 2. Deploy the backend service (`nextalx-api`)
 
 1. **+ New** → **GitHub Repo** → pick the same repo (or use the auto-created service).
-2. Open the service → **Settings** → set **Root Directory** to `backend/nextalx-api`.
-   - The included `nixpacks.toml` handles the build (`mvn clean package`) and start (`java -jar target/nextalx-api-0.0.1-SNAPSHOT.jar`).
+2. Open the service → **Settings** → set **Root Directory** to `backend/nextalx-api`, and set **Build → Builder** to **Dockerfile**.
+   - The included `Dockerfile` builds with a pinned `maven:3.9-eclipse-temurin-21` image (guaranteeing JDK 21) and runs the jar on a slim `eclipse-temurin:21-jre`. This avoids the Nixpacks "release version 21 not supported" error, where Nixpacks' bundled Maven uses an older JDK.
+   - (A `nixpacks.toml` is also present as a fallback, but the Dockerfile is the recommended, deterministic build.)
 3. **Settings → Networking** → **Generate Domain** (gives you e.g. `https://nextalx-api-production.up.railway.app`).
 4. **Variables** — add:
 
