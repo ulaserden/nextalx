@@ -30,6 +30,11 @@ spring:
   lifecycle:
     timeout-per-shutdown-phase: 20s
 
+app:
+  # Optional API key. Leave empty to keep the API open (default). When set,
+  # requests to /api/v1/** must send a matching X-API-Key header.
+  api-key: ${API_KEY:}
+
 server:
   port: ${PORT:8080}
   shutdown: graceful
