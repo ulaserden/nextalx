@@ -10,6 +10,8 @@ import {
     CircularProgress
 } from "@mui/material";
 
+import toast from "react-hot-toast";
+
 import AssetsTable
     from "../features/assets/AssetsTable";
 
@@ -26,38 +28,44 @@ import {
 
 function AssetsPage() {
 
-    const [assets,
-        setAssets] =
+    const [assets, setAssets] =
         useState([]);
 
-    const [loading,
-        setLoading] =
+    const [loading, setLoading] =
         useState(true);
 
-    const [dialogOpen,
-        setDialogOpen] =
+    const [dialogOpen, setDialogOpen] =
         useState(false);
 
-    const [selectedAsset,
-        setSelectedAsset] =
+    const [selectedAsset, setSelectedAsset] =
         useState(null);
 
     const fetchAssets =
         async () => {
 
-            const response =
-                await getAssets(
-                    0,
-                    100
+            try {
+
+                const response =
+                    await getAssets(
+                        0,
+                        100
+                    );
+
+                setAssets(
+                    response.content
                 );
 
-            setAssets(
-                response.content
-            );
+            } catch (error) {
 
-            setLoading(
-                false
-            );
+                toast.error(
+                    error?.userMessage ||
+                    "Assets could not be loaded."
+                );
+
+            } finally {
+
+                setLoading(false);
+            }
         };
 
     useEffect(() => {
@@ -69,35 +77,108 @@ function AssetsPage() {
     const handleSubmit =
         async (data) => {
 
-            if (selectedAsset) {
+            try {
 
-                await updateAsset(
-                    selectedAsset.id,
-                    data
-                );
+                if (selectedAsset) {
 
-            } else {
+                    await updateAsset(
+                        selectedAsset.id,
+                        data
+                    );
 
-                await createAsset(
-                    data
+                    toast.success(
+                        "Asset updated successfully."
+                    );
+
+                } else {
+
+                    await createAsset(data);
+
+                    toast.success(
+                        "Asset created successfully."
+                    );
+                }
+
+                setDialogOpen(false);
+
+                setSelectedAsset(null);
+
+                await fetchAssets();
+
+            } catch (error) {
+
+                toast.error(
+                    error?.userMessage ||
+                    "Asset could not be saved."
                 );
             }
+        };
 
-            setDialogOpen(
-                false
-            );
+    const handleRepair =
+        async (asset) => {
 
-            setSelectedAsset(
-                null
-            );
+            try {
 
-            await fetchAssets();
+                await setAssetRepair(asset.id);
+
+                await fetchAssets();
+
+                toast.success(
+                    "Asset marked as in repair."
+                );
+
+            } catch (error) {
+
+                toast.error(
+                    error?.userMessage ||
+                    "Asset could not be updated."
+                );
+            }
+        };
+
+    const handleRetire =
+        async (asset) => {
+
+            const confirmed =
+                window.confirm(
+                    `Retire asset "${asset.name}"? This cannot be undone.`
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+
+                await setAssetRetired(asset.id);
+
+                await fetchAssets();
+
+                toast.success(
+                    "Asset retired."
+                );
+
+            } catch (error) {
+
+                toast.error(
+                    error?.userMessage ||
+                    "Asset could not be updated."
+                );
+            }
         };
 
     if (loading) {
 
         return (
-            <CircularProgress />
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mt: 5
+                }}
+            >
+                <CircularProgress />
+            </Box>
         );
     }
 
@@ -107,28 +188,29 @@ function AssetsPage() {
             <Box
                 sx={{
                     display: "flex",
-                    justifyContent:
-                        "space-between",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
                     mb: 3
                 }}
             >
                 <Typography
                     variant="h4"
-                    sx={{
-                    
-                    color: "text.primary"
-                }}
+                    fontWeight={600}
+                    color="text.primary"
                 >
                     Assets
                 </Typography>
 
                 <Button
                     variant="contained"
-                    onClick={() =>
-                        setDialogOpen(
-                            true
-                        )
-                    }
+                    onClick={() => {
+
+                        setSelectedAsset(null);
+
+                        setDialogOpen(true);
+                    }}
                 >
                     Add Asset
                 </Button>
@@ -138,56 +220,24 @@ function AssetsPage() {
                 assets={assets}
                 onEdit={(asset) => {
 
-                    setSelectedAsset(
-                        asset
-                    );
+                    setSelectedAsset(asset);
 
-                    setDialogOpen(
-                        true
-                    );
+                    setDialogOpen(true);
                 }}
-                onRepair={
-                    async asset => {
-
-                        await setAssetRepair(
-                            asset.id
-                        );
-
-                        fetchAssets();
-                    }
-                }
-                onRetire={
-                    async asset => {
-
-                        await setAssetRetired(
-                            asset.id
-                        );
-
-                        fetchAssets();
-                    }
-                }
+                onRepair={handleRepair}
+                onRetire={handleRetire}
             />
 
             <AssetDialog
-                open={
-                    dialogOpen
-                }
-                asset={
-                    selectedAsset
-                }
+                open={dialogOpen}
+                asset={selectedAsset}
                 onClose={() => {
 
-                    setDialogOpen(
-                        false
-                    );
+                    setDialogOpen(false);
 
-                    setSelectedAsset(
-                        null
-                    );
+                    setSelectedAsset(null);
                 }}
-                onSubmit={
-                    handleSubmit
-                }
+                onSubmit={handleSubmit}
             />
 
         </Box>
