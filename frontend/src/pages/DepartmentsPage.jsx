@@ -264,7 +264,7 @@ function DepartmentsPage() {
                     variant="h4"
                     sx={{
                     
-                    color: "#111"
+                    color: "text.primary"
                 }}
                     fontWeight={600}
                 >

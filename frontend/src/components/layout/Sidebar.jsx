@@ -1,4 +1,5 @@
 import {
+    Box,
     Drawer,
     Toolbar,
     List,
@@ -18,8 +19,6 @@ import CategoryIcon from "@mui/icons-material/Category";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 
 import { Link } from "react-router-dom";
-
-const drawerWidth = 240;
 
 const menuItems = [
     {
@@ -54,20 +53,14 @@ const menuItems = [
     }
 ];
 
-function Sidebar() {
+function Sidebar({
+    drawerWidth = 240,
+    mobileOpen = false,
+    onClose
+}) {
 
-    return (
-        <Drawer
-            variant="permanent"
-            sx={{
-                width: drawerWidth,
-                flexShrink: 0,
-                "& .MuiDrawer-paper": {
-                    width: drawerWidth,
-                    boxSizing: "border-box"
-                }
-            }}
-        >
+    const drawerContent = (
+        <>
             <Toolbar>
                 <Typography
                     variant="h5"
@@ -90,6 +83,7 @@ function Sidebar() {
                             <ListItemButton
                                 component={Link}
                                 to={item.path}
+                                onClick={onClose}
                             >
                                 <ListItemIcon>
                                     {item.icon}
@@ -103,7 +97,61 @@ function Sidebar() {
                     ))
                 }
             </List>
-        </Drawer>
+        </>
+    );
+
+    return (
+        <Box
+            component="nav"
+            sx={{
+                width: {
+                    md: drawerWidth
+                },
+                flexShrink: {
+                    md: 0
+                }
+            }}
+        >
+            {/* Mobile: temporary drawer opened via the Topbar menu button */}
+            <Drawer
+                variant="temporary"
+                open={mobileOpen}
+                onClose={onClose}
+                ModalProps={{
+                    keepMounted: true
+                }}
+                sx={{
+                    display: {
+                        xs: "block",
+                        md: "none"
+                    },
+                    "& .MuiDrawer-paper": {
+                        width: drawerWidth,
+                        boxSizing: "border-box"
+                    }
+                }}
+            >
+                {drawerContent}
+            </Drawer>
+
+            {/* Desktop: permanent drawer */}
+            <Drawer
+                variant="permanent"
+                open
+                sx={{
+                    display: {
+                        xs: "none",
+                        md: "block"
+                    },
+                    "& .MuiDrawer-paper": {
+                        width: drawerWidth,
+                        boxSizing: "border-box"
+                    }
+                }}
+            >
+                {drawerContent}
+            </Drawer>
+        </Box>
     );
 }
 

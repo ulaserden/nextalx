@@ -7,7 +7,9 @@ import {
     TextField,
     MenuItem,
     Typography,
-    Box
+    Box,
+    useMediaQuery,
+    useTheme
 } from "@mui/material";
 
 import {
@@ -28,6 +30,9 @@ function CreateAssignmentDialog({
     onClose,
     onSave
 }) {
+
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [
         employees,
@@ -138,6 +143,7 @@ function CreateAssignmentDialog({
 
     return (
         <Dialog
+            fullScreen={fullScreen}
             open={open}
             onClose={onClose}
             fullWidth

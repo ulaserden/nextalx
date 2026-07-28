@@ -62,7 +62,7 @@ function DashboardPage() {
                 variant="h4"
                 sx={{
                     mb: 4,
-                    color: "#111"
+                    color: "text.primary"
                 }}
             >
                 Dashboard

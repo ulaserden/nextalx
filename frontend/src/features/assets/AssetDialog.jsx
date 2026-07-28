@@ -8,7 +8,9 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem,
+    useMediaQuery,
+    useTheme
 } from "@mui/material";
 
 import {
@@ -26,6 +28,9 @@ function AssetDialog({
     onSubmit,
     asset
 }) {
+
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [categories, setCategories] =
         useState([]);
@@ -153,6 +158,7 @@ function AssetDialog({
 
     return (
         <Dialog
+            fullScreen={fullScreen}
             open={open}
             onClose={onClose}
             fullWidth

@@ -4,7 +4,9 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    TextField
+    TextField,
+    useMediaQuery,
+    useTheme
 } from "@mui/material";
 
 import {
@@ -18,6 +20,9 @@ function CategoryDialog({
     onSubmit,
     category
 }) {
+
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [formData, setFormData] =
         useState({
@@ -63,6 +68,7 @@ function CategoryDialog({
 
     return (
         <Dialog
+            fullScreen={fullScreen}
             open={open}
             onClose={onClose}
             fullWidth

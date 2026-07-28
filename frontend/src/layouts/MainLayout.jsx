@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Outlet } from "react-router-dom";
 
 import {
@@ -7,7 +9,20 @@ import {
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 
+const drawerWidth = 240;
+
 function MainLayout() {
+
+    const [
+        mobileOpen,
+        setMobileOpen
+    ] = useState(false);
+
+    const handleDrawerToggle =
+        () => setMobileOpen((prev) => !prev);
+
+    const handleDrawerClose =
+        () => setMobileOpen(false);
 
     return (
         <Box
@@ -15,21 +30,33 @@ function MainLayout() {
                 display: "flex"
             }}
         >
-            <Sidebar />
+            <Sidebar
+                drawerWidth={drawerWidth}
+                mobileOpen={mobileOpen}
+                onClose={handleDrawerClose}
+            />
 
             <Box
                 component="main"
                 sx={{
                     flexGrow: 1,
                     minHeight: "100vh",
-                    backgroundColor: "#f5f7fa"
+                    width: {
+                        md: `calc(100% - ${drawerWidth}px)`
+                    },
+                    backgroundColor: "background.default"
                 }}
             >
-                <Topbar />
+                <Topbar
+                    onMenuClick={handleDrawerToggle}
+                />
 
                 <Box
                     sx={{
-                        p: 4
+                        p: {
+                            xs: 2,
+                            md: 4
+                        }
                     }}
                 >
                     <Outlet />

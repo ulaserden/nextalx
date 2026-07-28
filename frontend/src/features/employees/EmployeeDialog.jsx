@@ -8,7 +8,9 @@ import {
     InputLabel,
     MenuItem,
     Select,
-    TextField
+    TextField,
+    useMediaQuery,
+    useTheme
 } from "@mui/material";
 
 import {
@@ -26,6 +28,9 @@ function EmployeeDialog({
     onSubmit,
     employee
 }) {
+
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [departments, setDepartments] =
         useState([]);
@@ -120,6 +125,7 @@ function EmployeeDialog({
 
     return (
         <Dialog
+            fullScreen={fullScreen}
             open={open}
             onClose={onClose}
             fullWidth
