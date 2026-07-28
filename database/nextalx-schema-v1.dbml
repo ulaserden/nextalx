@@ -1,12 +1,13 @@
 Project Nextalx {
   database_type: "PostgreSQL"
-  Note: "Nextalx IT Asset Management System v1.0"
+  Note: "Nextalx IT Asset Management System v1.0 — reflects Flyway migrations V1–V5"
 }
 
 Table departments {
   id bigint [pk, increment]
   name varchar(100) [not null, unique]
   description varchar(255)
+  status varchar(20) [not null, default: 'ACTIVE', note: "ACTIVE / INACTIVE"]
 
   created_at timestamp [not null]
   updated_at timestamp [not null]
@@ -23,7 +24,7 @@ Table employees {
 
   job_title varchar(100)
 
-  status varchar(20) [not null, note: "ACTIVE / INACTIVE"]
+  status varchar(20) [not null, note: "CHECK: ACTIVE / INACTIVE"]
 
   department_id bigint [not null]
 
@@ -31,64 +32,63 @@ Table employees {
   updated_at timestamp [not null]
 }
 
-Table asset_categories {
-
+Table categories {
   id bigint [pk, increment]
 
   name varchar(100) [not null, unique]
-
   description varchar(255)
+  status varchar(20) [not null, default: 'ACTIVE', note: "ACTIVE / INACTIVE"]
 
   created_at timestamp [not null]
-
   updated_at timestamp [not null]
 }
 
 Table assets {
-
   id bigint [pk, increment]
 
-  asset_tag varchar(20) [not null, unique]
+  asset_tag varchar(50) [not null, unique]
+  name varchar(150) [not null]
 
-  serial_number varchar(100) [not null, unique]
+  brand varchar(100)
+  model varchar(100)
 
-  brand varchar(100) [not null]
-
-  model varchar(100) [not null]
+  serial_number varchar(100) [unique]
 
   purchase_date date
-
   warranty_end_date date
 
-  status varchar(30) [not null, note: "AVAILABLE, ASSIGNED, MAINTENANCE, RETIRED, LOST"]
+  purchase_price numeric(12,2)
+  supplier varchar(150)
+
+  status varchar(30) [not null, default: 'AVAILABLE', note: "App-enforced (AssetStatus): AVAILABLE, ASSIGNED, MAINTENANCE, RETIRED, LOST"]
 
   category_id bigint [not null]
 
   created_at timestamp [not null]
-
   updated_at timestamp [not null]
 }
 
 Table assignments {
-
   id bigint [pk, increment]
 
   employee_id bigint [not null]
-
   asset_id bigint [not null]
 
   assigned_date date [not null]
-
+  expected_return_date date
   returned_date date
 
-  notes text
+  notes varchar(500)
+
+  status varchar(20) [not null, default: 'ACTIVE', note: "App-enforced (AssignmentStatus)"]
 
   created_at timestamp [not null]
+  updated_at timestamp [not null]
 }
 
 Ref: employees.department_id > departments.id
 
-Ref: assets.category_id > asset_categories.id
+Ref: assets.category_id > categories.id
 
 Ref: assignments.employee_id > employees.id
 

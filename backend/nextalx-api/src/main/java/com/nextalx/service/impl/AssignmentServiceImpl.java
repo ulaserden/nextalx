@@ -87,6 +87,16 @@ public class AssignmentServiceImpl
             );
         }
 
+        if (
+                asset.getStatus() != AssetStatus.AVAILABLE
+        ) {
+
+            throw new AssetAlreadyAssignedException(
+                    "Asset is not available for assignment. Current status: "
+                            + asset.getStatus()
+            );
+        }
+
         Assignment assignment =
                 assignmentMapper.toEntity(
                         request,
@@ -129,6 +139,15 @@ public class AssignmentServiceImpl
                                 new AssignmentNotFoundException(
                                         "Assignment not found."
                                 ));
+
+        if (
+                assignment.getReturnedDate() != null
+        ) {
+
+            throw new IllegalStateException(
+                    "Assignment has already been returned."
+            );
+        }
 
         assignment.setReturnedDate(
                 LocalDate.now()

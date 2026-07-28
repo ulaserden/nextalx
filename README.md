@@ -10,7 +10,7 @@ Modern, scalable and user-friendly IT Asset Management solution developed for en
 
 Kurumsal ortamlar için geliştirilmiş modern, ölçeklenebilir ve kullanıcı dostu BT Varlık Yönetim Platformu.
 
-![Java](https://img.shields.io/badge/Java-25-orange)
+![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5-green)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)
 ![React](https://img.shields.io/badge/React-19-61DAFB)
@@ -78,10 +78,9 @@ The goal of the project is to provide a clean, maintainable and extensible archi
 - Status management:
     - AVAILABLE
     - ASSIGNED
-    - IN_REPAIR
-    - LOST
-    - BROKEN
+    - MAINTENANCE
     - RETIRED
+    - LOST
 
 ### 🔄 Assignment Management
 
@@ -96,7 +95,7 @@ The goal of the project is to provide a clean, maintainable and extensible archi
 
 ### Backend
 
-- Java 25
+- Java 21
 - Spring Boot 3.5
 - Hibernate
 - PostgreSQL
@@ -290,10 +289,9 @@ Desteklenen durumlar:
 
 - AVAILABLE
 - ASSIGNED
-- IN_REPAIR
-- LOST
-- BROKEN
+- MAINTENANCE
 - RETIRED
+- LOST
 
 ### 🔄 Atama Yönetimi
 
@@ -307,7 +305,7 @@ Desteklenen durumlar:
 
 ### Backend
 
-- Java 25
+- Java 21
 - Spring Boot 3.5
 - Hibernate
 - PostgreSQL
