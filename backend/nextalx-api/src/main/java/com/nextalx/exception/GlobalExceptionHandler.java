@@ -5,9 +5,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -204,6 +206,48 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(message.isBlank() ? "Validation failed." : message)
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+
+    /**
+     * Malformed / unreadable request body (e.g. invalid JSON, bad date format).
+     * Returns 400 instead of falling through to the catch-all 500.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnreadableMessage(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest request
+    ) {
+
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message("Malformed request body.")
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+
+    /**
+     * Type mismatch on a path variable / request param (e.g. a non-numeric id).
+     * Returns 400 instead of a raw 500.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request
+    ) {
+
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message("Invalid value for parameter '" + ex.getName() + "'.")
                 .path(request.getRequestURI())
                 .build();
 

@@ -7,6 +7,7 @@ import com.nextalx.service.AssetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,6 +36,8 @@ public class AssetController {
                 size
         );
     }
+
+    @ResponseStatus(HttpStatus.CREATED)
 
     @PostMapping
     public AssetResponse createAsset(
