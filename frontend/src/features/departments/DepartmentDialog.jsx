@@ -30,15 +30,22 @@ function DepartmentDialog({
             description: ""
         });
 
+    const [error, setError] =
+        useState("");
+
+    const [submitting, setSubmitting] =
+        useState(false);
+
     useEffect(() => {
+
+        setError("");
 
         if (department) {
 
             setFormData({
-                name:
-                    department.name,
+                name: department.name || "",
                 description:
-                    department.description
+                    department.description || ""
             });
 
         } else {
@@ -49,7 +56,7 @@ function DepartmentDialog({
             });
         }
 
-    }, [department]);
+    }, [department, open]);
 
     const handleChange =
         (event) => {
@@ -62,11 +69,23 @@ function DepartmentDialog({
         };
 
     const handleSubmit =
-        () => {
+        async () => {
 
-            onSubmit(
-                formData
-            );
+            if (!formData.name.trim()) {
+                setError("Name is required.");
+                return;
+            }
+
+            setSubmitting(true);
+
+            try {
+
+                await onSubmit(formData);
+
+            } finally {
+
+                setSubmitting(false);
+            }
         };
 
     return (
@@ -98,6 +117,9 @@ function DepartmentDialog({
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
+                    error={!!error}
+                    helperText={error}
+                    required
                     fullWidth
                 />
 
@@ -116,6 +138,7 @@ function DepartmentDialog({
 
                 <Button
                     onClick={onClose}
+                    disabled={submitting}
                 >
                     Cancel
                 </Button>
@@ -123,6 +146,7 @@ function DepartmentDialog({
                 <Button
                     variant="contained"
                     onClick={handleSubmit}
+                    disabled={submitting}
                 >
                     {
                         department

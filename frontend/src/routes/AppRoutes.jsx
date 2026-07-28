@@ -25,6 +25,9 @@ import AssetsPage
 import AssignmentsPage
     from "../pages/AssignmentsPage";
 
+import NotFoundPage
+    from "../pages/NotFoundPage";
+
 function AppRoutes() {
 
     return (
@@ -77,6 +80,13 @@ function AppRoutes() {
                         path="/assignments"
                         element={
                             <AssignmentsPage />
+                        }
+                    />
+
+                    <Route
+                        path="*"
+                        element={
+                            <NotFoundPage />
                         }
                     />
 

@@ -5,6 +5,7 @@ import {
     DialogContent,
     DialogTitle,
     FormControl,
+    FormHelperText,
     InputLabel,
     MenuItem,
     Select,
@@ -22,6 +23,15 @@ import {
     getDepartments
 } from "../../services/departmentService";
 
+const EMPTY_FORM = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    jobTitle: "",
+    departmentId: ""
+};
+
 function EmployeeDialog({
     open,
     onClose,
@@ -36,14 +46,13 @@ function EmployeeDialog({
         useState([]);
 
     const [formData, setFormData] =
-        useState({
-            firstName: "",
-            lastName: "",
-            email: "",
-            phone: "",
-            jobTitle: "",
-            departmentId: ""
-        });
+        useState(EMPTY_FORM);
+
+    const [errors, setErrors] =
+        useState({});
+
+    const [submitting, setSubmitting] =
+        useState(false);
 
     useEffect(() => {
 
@@ -69,36 +78,25 @@ function EmployeeDialog({
 
     useEffect(() => {
 
+        setErrors({});
+
         if (employee) {
 
             setFormData({
-                firstName:
-                    employee.firstName || "",
-                lastName:
-                    employee.lastName || "",
-                email:
-                    employee.email || "",
-                phone:
-                    employee.phone || "",
-                jobTitle:
-                    employee.jobTitle || "",
-                departmentId:
-                    employee.departmentId || ""
+                firstName: employee.firstName || "",
+                lastName: employee.lastName || "",
+                email: employee.email || "",
+                phone: employee.phone || "",
+                jobTitle: employee.jobTitle || "",
+                departmentId: employee.departmentId || ""
             });
 
         } else {
 
-            setFormData({
-                firstName: "",
-                lastName: "",
-                email: "",
-                phone: "",
-                jobTitle: "",
-                departmentId: ""
-            });
+            setFormData(EMPTY_FORM);
         }
 
-    }, [employee]);
+    }, [employee, open]);
 
     const handleChange =
         (event) => {
@@ -110,17 +108,60 @@ function EmployeeDialog({
             });
         };
 
-    const handleSubmit =
-        () => {
+    const validate = () => {
 
-            onSubmit({
-                ...formData,
-                status: "ACTIVE",
-                departmentId:
-                    Number(
+        const next = {};
+
+        if (!formData.firstName.trim()) {
+            next.firstName = "First name is required.";
+        }
+
+        if (!formData.lastName.trim()) {
+            next.lastName = "Last name is required.";
+        }
+
+        if (!formData.email.trim()) {
+            next.email = "Email is required.";
+        } else if (
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                formData.email
+            )
+        ) {
+            next.email = "Enter a valid email address.";
+        }
+
+        if (!formData.departmentId) {
+            next.departmentId = "Department is required.";
+        }
+
+        setErrors(next);
+
+        return Object.keys(next).length === 0;
+    };
+
+    const handleSubmit =
+        async () => {
+
+            if (!validate()) {
+                return;
+            }
+
+            setSubmitting(true);
+
+            try {
+
+                await onSubmit({
+                    ...formData,
+                    status: employee?.status || "ACTIVE",
+                    departmentId: Number(
                         formData.departmentId
                     )
-            });
+                });
+
+            } finally {
+
+                setSubmitting(false);
+            }
         };
 
     return (
@@ -152,6 +193,9 @@ function EmployeeDialog({
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
+                    error={!!errors.firstName}
+                    helperText={errors.firstName}
+                    required
                     fullWidth
                 />
 
@@ -160,14 +204,21 @@ function EmployeeDialog({
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
+                    error={!!errors.lastName}
+                    helperText={errors.lastName}
+                    required
                     fullWidth
                 />
 
                 <TextField
                     label="Email"
                     name="email"
+                    type="email"
                     value={formData.email}
                     onChange={handleChange}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    required
                     fullWidth
                 />
 
@@ -187,51 +238,59 @@ function EmployeeDialog({
                     fullWidth
                 />
 
-                <FormControl fullWidth>
+                <FormControl
+                    fullWidth
+                    required
+                    error={!!errors.departmentId}
+                >
                     <InputLabel>
                         Department
                     </InputLabel>
 
                     <Select
                         name="departmentId"
-                        value={
-                            formData.departmentId
-                        }
+                        value={formData.departmentId}
                         label="Department"
                         onChange={handleChange}
                     >
                         {
                             departments.map(
-                                department => (
+                                (department) => (
                                     <MenuItem
-                                        key={
-                                            department.id
-                                        }
-                                        value={
-                                            department.id
-                                        }
+                                        key={department.id}
+                                        value={department.id}
                                     >
-                                        {
-                                            department.name
-                                        }
+                                        {department.name}
                                     </MenuItem>
                                 )
                             )
                         }
                     </Select>
+
+                    {
+                        errors.departmentId && (
+                            <FormHelperText>
+                                {errors.departmentId}
+                            </FormHelperText>
+                        )
+                    }
                 </FormControl>
 
             </DialogContent>
 
             <DialogActions>
 
-                <Button onClick={onClose}>
+                <Button
+                    onClick={onClose}
+                    disabled={submitting}
+                >
                     Cancel
                 </Button>
 
                 <Button
                     variant="contained"
                     onClick={handleSubmit}
+                    disabled={submitting}
                 >
                     {
                         employee
