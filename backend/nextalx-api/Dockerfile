@@ -8,17 +8,21 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn -B -q dependency:go-offline
 
-# Build the application.
+# Build the application and normalize the jar name (decouples from the version).
 COPY src ./src
-RUN mvn -B -DskipTests clean package
+RUN mvn -B -DskipTests clean package && cp target/*.jar app.jar
 
 # ---- Runtime stage: slim JRE 21 ----
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY --from=build /app/target/nextalx-api-0.0.1-SNAPSHOT.jar app.jar
+# Run as an unprivileged user.
+RUN groupadd --system app && useradd --system --gid app --home /app app
+
+COPY --from=build /app/app.jar app.jar
+USER app
 
 # Railway injects PORT; Spring reads it via server.port=${PORT:8080}.
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]
