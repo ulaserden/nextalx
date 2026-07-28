@@ -50,16 +50,33 @@ function CreateAssignmentDialog({
     ] = useState({
         employeeId: "",
         assetId: "",
-        assignedDate: new Date()
-            .toISOString()
-            .split("T")[0],
+        assignedDate: "",
         expectedReturnDate: "",
         note: ""
     });
 
+    const [errors, setErrors] =
+        useState({});
+
+    const [submitting, setSubmitting] =
+        useState(false);
+
     useEffect(() => {
 
         if (open) {
+
+            setErrors({});
+
+            setForm({
+                employeeId: "",
+                assetId: "",
+                assignedDate: new Date()
+                    .toISOString()
+                    .split("T")[0],
+                expectedReturnDate: "",
+                note: ""
+            });
+
             loadData();
         }
 
@@ -113,32 +130,60 @@ function CreateAssignmentDialog({
         });
     };
 
+    const validate = () => {
+
+        const next = {};
+
+        if (!form.employeeId) {
+            next.employeeId = "Employee is required.";
+        }
+
+        if (!form.assetId) {
+            next.assetId = "Asset is required.";
+        }
+
+        if (!form.assignedDate) {
+            next.assignedDate = "Assigned date is required.";
+        }
+
+        if (
+            form.assignedDate &&
+            form.expectedReturnDate &&
+            form.expectedReturnDate < form.assignedDate
+        ) {
+            next.expectedReturnDate =
+                "Expected return date cannot be before the assigned date.";
+        }
+
+        setErrors(next);
+
+        return Object.keys(next).length === 0;
+    };
+
     const handleSave =
-        () => {
+        async () => {
 
-            onSave(
-                {
-                    employeeId:
-                        Number(
-                            form.employeeId
-                        ),
+            if (!validate()) {
+                return;
+            }
 
-                    assetId:
-                        Number(
-                            form.assetId
-                        ),
+            setSubmitting(true);
 
-                    assignedDate:
-                        form.assignedDate,
+            try {
 
+                await onSave({
+                    employeeId: Number(form.employeeId),
+                    assetId: Number(form.assetId),
+                    assignedDate: form.assignedDate,
                     expectedReturnDate:
-                        form.expectedReturnDate ||
-                        null,
+                        form.expectedReturnDate || null,
+                    note: form.note
+                });
 
-                    note:
-                        form.note
-                }
-            );
+            } finally {
+
+                setSubmitting(false);
+            }
         };
 
     return (
@@ -162,6 +207,9 @@ function CreateAssignmentDialog({
                     margin="normal"
                     label="Employee"
                     name="employeeId"
+                    required
+                    error={!!errors.employeeId}
+                    helperText={errors.employeeId}
                     value={
                         form.employeeId
                     }
@@ -197,6 +245,9 @@ function CreateAssignmentDialog({
                     margin="normal"
                     label="Asset"
                     name="assetId"
+                    required
+                    error={!!errors.assetId}
+                    helperText={errors.assetId}
                     value={
                         form.assetId
                     }
@@ -271,6 +322,8 @@ function CreateAssignmentDialog({
                         fullWidth
                         type="date"
                         name="expectedReturnDate"
+                        error={!!errors.expectedReturnDate}
+                        helperText={errors.expectedReturnDate}
                         value={
                             form.expectedReturnDate
                         }
@@ -300,18 +353,16 @@ function CreateAssignmentDialog({
             <DialogActions>
 
                 <Button
-                    onClick={
-                        onClose
-                    }
+                    onClick={onClose}
+                    disabled={submitting}
                 >
                     Cancel
                 </Button>
 
                 <Button
                     variant="contained"
-                    onClick={
-                        handleSave
-                    }
+                    onClick={handleSave}
+                    disabled={submitting}
                 >
                     Save
                 </Button>

@@ -30,14 +30,22 @@ function CategoryDialog({
             description: ""
         });
 
+    const [error, setError] =
+        useState("");
+
+    const [submitting, setSubmitting] =
+        useState(false);
+
     useEffect(() => {
+
+        setError("");
 
         if (category) {
 
             setFormData({
-                name: category.name,
+                name: category.name || "",
                 description:
-                    category.description
+                    category.description || ""
             });
 
         } else {
@@ -48,7 +56,7 @@ function CategoryDialog({
             });
         }
 
-    }, [category]);
+    }, [category, open]);
 
     const handleChange =
         (event) => {
@@ -61,9 +69,23 @@ function CategoryDialog({
         };
 
     const handleSubmit =
-        () => {
+        async () => {
 
-            onSubmit(formData);
+            if (!formData.name.trim()) {
+                setError("Name is required.");
+                return;
+            }
+
+            setSubmitting(true);
+
+            try {
+
+                await onSubmit(formData);
+
+            } finally {
+
+                setSubmitting(false);
+            }
         };
 
     return (
@@ -95,6 +117,9 @@ function CategoryDialog({
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
+                    error={!!error}
+                    helperText={error}
+                    required
                     fullWidth
                 />
 
@@ -113,6 +138,7 @@ function CategoryDialog({
 
                 <Button
                     onClick={onClose}
+                    disabled={submitting}
                 >
                     Cancel
                 </Button>
@@ -120,6 +146,7 @@ function CategoryDialog({
                 <Button
                     variant="contained"
                     onClick={handleSubmit}
+                    disabled={submitting}
                 >
                     {
                         category

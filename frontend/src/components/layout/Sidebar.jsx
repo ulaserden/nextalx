@@ -18,7 +18,7 @@ import ComputerIcon from "@mui/icons-material/Computer";
 import CategoryIcon from "@mui/icons-material/Category";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
     {
@@ -59,6 +59,13 @@ function Sidebar({
     onClose
 }) {
 
+    const { pathname } = useLocation();
+
+    const isActive = (path) =>
+        path === "/"
+            ? pathname === "/"
+            : pathname.startsWith(path);
+
     const drawerContent = (
         <>
             <Toolbar>
@@ -84,6 +91,7 @@ function Sidebar({
                                 component={Link}
                                 to={item.path}
                                 onClick={onClose}
+                                selected={isActive(item.path)}
                             >
                                 <ListItemIcon>
                                     {item.icon}

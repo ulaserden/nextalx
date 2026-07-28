@@ -6,6 +6,7 @@ import {
     TextField,
     Button,
     FormControl,
+    FormHelperText,
     InputLabel,
     Select,
     MenuItem,
@@ -22,6 +23,19 @@ import {
     getCategories
 } from "../../services/categoryService";
 
+const EMPTY_FORM = {
+    assetTag: "",
+    name: "",
+    brand: "",
+    model: "",
+    serialNumber: "",
+    purchaseDate: "",
+    warrantyEndDate: "",
+    purchasePrice: "",
+    supplier: "",
+    categoryId: ""
+};
+
 function AssetDialog({
     open,
     onClose,
@@ -36,18 +50,13 @@ function AssetDialog({
         useState([]);
 
     const [formData, setFormData] =
-        useState({
-            assetTag: "",
-            name: "",
-            brand: "",
-            model: "",
-            serialNumber: "",
-            purchaseDate: "",
-            warrantyEndDate: "",
-            purchasePrice: "",
-            supplier: "",
-            categoryId: ""
-        });
+        useState(EMPTY_FORM);
+
+    const [errors, setErrors] =
+        useState({});
+
+    const [submitting, setSubmitting] =
+        useState(false);
 
     useEffect(() => {
 
@@ -66,9 +75,8 @@ function AssetDialog({
                         response.content
                     );
 
-                } catch (error) {
-
-                    console.error(error);
+                } catch {
+                    // surfaced by the caller's error handling
                 }
             };
 
@@ -80,57 +88,30 @@ function AssetDialog({
 
     useEffect(() => {
 
+        setErrors({});
+
         if (asset) {
 
             setFormData({
-                assetTag:
-                    asset.assetTag || "",
-
-                name:
-                    asset.name || "",
-
-                brand:
-                    asset.brand || "",
-
-                model:
-                    asset.model || "",
-
-                serialNumber:
-                    asset.serialNumber || "",
-
-                purchaseDate:
-                    asset.purchaseDate || "",
-
-                warrantyEndDate:
-                    asset.warrantyEndDate || "",
-
+                assetTag: asset.assetTag || "",
+                name: asset.name || "",
+                brand: asset.brand || "",
+                model: asset.model || "",
+                serialNumber: asset.serialNumber || "",
+                purchaseDate: asset.purchaseDate || "",
+                warrantyEndDate: asset.warrantyEndDate || "",
                 purchasePrice:
-                    asset.purchasePrice || "",
-
-                supplier:
-                    asset.supplier || "",
-
-                categoryId:
-                    asset.categoryId || ""
+                    asset.purchasePrice ?? "",
+                supplier: asset.supplier || "",
+                categoryId: asset.categoryId || ""
             });
 
         } else {
 
-            setFormData({
-                assetTag: "",
-                name: "",
-                brand: "",
-                model: "",
-                serialNumber: "",
-                purchaseDate: "",
-                warrantyEndDate: "",
-                purchasePrice: "",
-                supplier: "",
-                categoryId: ""
-            });
+            setFormData(EMPTY_FORM);
         }
 
-    }, [asset]);
+    }, [asset, open]);
 
     const handleChange =
         (event) => {
@@ -142,18 +123,79 @@ function AssetDialog({
             });
         };
 
-    const handleSubmit =
-        () => {
+    const validate = () => {
 
-            onSubmit({
-                ...formData,
-                categoryId:
-                    Number(
-                        formData.categoryId
-                    ),
-                status:
-                    "AVAILABLE"
-            });
+        const next = {};
+
+        if (!formData.assetTag.trim()) {
+            next.assetTag = "Asset tag is required.";
+        }
+
+        if (!formData.name.trim()) {
+            next.name = "Name is required.";
+        }
+
+        if (!formData.categoryId) {
+            next.categoryId = "Category is required.";
+        }
+
+        if (formData.purchasePrice !== "") {
+
+            const price = Number(formData.purchasePrice);
+
+            if (Number.isNaN(price) || price < 0) {
+                next.purchasePrice =
+                    "Enter a valid non-negative price.";
+            }
+        }
+
+        if (
+            formData.purchaseDate &&
+            formData.warrantyEndDate &&
+            formData.warrantyEndDate < formData.purchaseDate
+        ) {
+            next.warrantyEndDate =
+                "Warranty end date cannot be before the purchase date.";
+        }
+
+        setErrors(next);
+
+        return Object.keys(next).length === 0;
+    };
+
+    const handleSubmit =
+        async () => {
+
+            if (!validate()) {
+                return;
+            }
+
+            setSubmitting(true);
+
+            try {
+
+                await onSubmit({
+                    assetTag: formData.assetTag.trim(),
+                    name: formData.name.trim(),
+                    brand: formData.brand || null,
+                    model: formData.model || null,
+                    serialNumber: formData.serialNumber || null,
+                    purchaseDate: formData.purchaseDate || null,
+                    warrantyEndDate:
+                        formData.warrantyEndDate || null,
+                    purchasePrice:
+                        formData.purchasePrice === ""
+                            ? null
+                            : Number(formData.purchasePrice),
+                    supplier: formData.supplier || null,
+                    categoryId: Number(formData.categoryId),
+                    status: asset ? asset.status : "AVAILABLE"
+                });
+
+            } finally {
+
+                setSubmitting(false);
+            }
         };
 
     return (
@@ -187,6 +229,9 @@ function AssetDialog({
                     name="assetTag"
                     value={formData.assetTag}
                     onChange={handleChange}
+                    error={!!errors.assetTag}
+                    helperText={errors.assetTag}
+                    required
                     fullWidth
                 />
 
@@ -195,6 +240,9 @@ function AssetDialog({
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
+                    error={!!errors.name}
+                    helperText={errors.name}
+                    required
                     fullWidth
                 />
 
@@ -242,6 +290,8 @@ function AssetDialog({
                     name="warrantyEndDate"
                     value={formData.warrantyEndDate}
                     onChange={handleChange}
+                    error={!!errors.warrantyEndDate}
+                    helperText={errors.warrantyEndDate}
                     fullWidth
                     slotProps={{
                         inputLabel: {
@@ -253,8 +303,11 @@ function AssetDialog({
                 <TextField
                     label="Purchase Price"
                     name="purchasePrice"
+                    type="number"
                     value={formData.purchasePrice}
                     onChange={handleChange}
+                    error={!!errors.purchasePrice}
+                    helperText={errors.purchasePrice}
                     fullWidth
                 />
 
@@ -266,7 +319,11 @@ function AssetDialog({
                     fullWidth
                 />
 
-                <FormControl fullWidth>
+                <FormControl
+                    fullWidth
+                    required
+                    error={!!errors.categoryId}
+                >
 
                     <InputLabel>
                         Category
@@ -292,6 +349,14 @@ function AssetDialog({
                         }
                     </Select>
 
+                    {
+                        errors.categoryId && (
+                            <FormHelperText>
+                                {errors.categoryId}
+                            </FormHelperText>
+                        )
+                    }
+
                 </FormControl>
 
             </DialogContent>
@@ -300,6 +365,7 @@ function AssetDialog({
 
                 <Button
                     onClick={onClose}
+                    disabled={submitting}
                 >
                     Cancel
                 </Button>
@@ -307,6 +373,7 @@ function AssetDialog({
                 <Button
                     variant="contained"
                     onClick={handleSubmit}
+                    disabled={submitting}
                 >
                     {
                         asset
