@@ -61,27 +61,6 @@ function CreateAssignmentDialog({
     const [submitting, setSubmitting] =
         useState(false);
 
-    useEffect(() => {
-
-        if (open) {
-
-            setErrors({});
-
-            setForm({
-                employeeId: "",
-                assetId: "",
-                assignedDate: new Date()
-                    .toISOString()
-                    .split("T")[0],
-                expectedReturnDate: "",
-                note: ""
-            });
-
-            loadData();
-        }
-
-    }, [open]);
-
     const loadData = async () => {
 
         try {
@@ -117,6 +96,27 @@ function CreateAssignmentDialog({
             );
         }
     };
+
+    useEffect(() => {
+
+        if (open) {
+
+            setErrors({});
+
+            setForm({
+                employeeId: "",
+                assetId: "",
+                assignedDate: new Date()
+                    .toISOString()
+                    .split("T")[0],
+                expectedReturnDate: "",
+                note: ""
+            });
+
+            loadData();
+        }
+
+    }, [open]);
 
     const handleChange = (
         event

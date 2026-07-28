@@ -17,5 +17,13 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // Fetching data on mount by calling an async loader in an effect is an
+      // intentional, correct pattern here; this strict rule flags it as a
+      // false positive.
+      'react-hooks/set-state-in-effect': 'off',
+      // Context file intentionally exports a provider component and its hook.
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ])
