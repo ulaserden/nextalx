@@ -66,6 +66,15 @@ public class AssignmentServiceImpl
                                         "Employee not found."
                                 ));
 
+        if (
+                "INACTIVE".equals(employee.getStatus())
+        ) {
+
+            throw new IllegalStateException(
+                    "Cannot assign an asset to an inactive employee."
+            );
+        }
+
         Asset asset =
                 assetRepository.findById(
                                 request.getAssetId()

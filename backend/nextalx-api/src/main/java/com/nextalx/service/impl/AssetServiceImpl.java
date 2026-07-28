@@ -11,6 +11,7 @@ import com.nextalx.exception.AssetNotFoundException;
 import com.nextalx.exception.CategoryNotFoundException;
 import com.nextalx.mapper.AssetMapper;
 import com.nextalx.repository.AssetRepository;
+import com.nextalx.repository.AssignmentRepository;
 import com.nextalx.repository.CategoryRepository;
 import com.nextalx.service.AssetService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class AssetServiceImpl
 
     private final AssetRepository assetRepository;
     private final CategoryRepository categoryRepository;
+    private final AssignmentRepository assignmentRepository;
     private final AssetMapper assetMapper;
 
     @Override
@@ -266,6 +268,18 @@ public class AssetServiceImpl
                                         "Asset not found."
                                 )
                         );
+
+        if (
+                assignmentRepository
+                        .existsByAssetIdAndReturnedDateIsNull(
+                                asset.getId()
+                        )
+        ) {
+
+            throw new IllegalStateException(
+                    "Asset has an active assignment; return it before changing its status."
+            );
+        }
 
         asset.setStatus(
                 status
