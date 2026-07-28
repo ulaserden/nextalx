@@ -37,9 +37,10 @@ These rules define the domain constraints enforced by the Nextalx backend. They 
 - Every asset has a lifecycle `status`, restricted to the following values:
   - **AVAILABLE** – in stock, not assigned to anyone.
   - **ASSIGNED** – currently checked out to an employee.
-  - **MAINTENANCE** – under repair or servicing.
+  - **IN_REPAIR** – under repair or servicing.
   - **RETIRED** – decommissioned, kept for historical records.
   - **LOST** – missing / unrecoverable.
+  - **BROKEN** – damaged and out of service.
 - New assets default to **AVAILABLE**.
 - Assets are never physically deleted. A decommissioned asset is set to **RETIRED** and remains in the system.
 
@@ -48,7 +49,8 @@ These rules define the domain constraints enforced by the Nextalx backend. They 
 - An asset can have **only one active assignment at a time**. An assignment is active while `returned_date IS NULL`.
 - Assigning an available asset to an employee sets the asset status to **ASSIGNED**.
 - Returning an asset records the `returned_date` and sets the asset status back to **AVAILABLE**.
-- An asset that is not **AVAILABLE** (e.g. MAINTENANCE, RETIRED, LOST) cannot be assigned.
+- An asset that is not **AVAILABLE** (e.g. IN_REPAIR, RETIRED, LOST, BROKEN) cannot be assigned.
+- An asset with an active assignment cannot have its status changed manually; it must be returned first.
 - Assignment history is **never deleted** — every checkout/return is preserved as an audit trail.
 
 ## 6. Data Integrity
