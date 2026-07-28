@@ -7,11 +7,14 @@ import {
 } from "react";
 
 import {
-    ThemeProvider,
-    createTheme
+    ThemeProvider
 } from "@mui/material/styles";
 
 import { CssBaseline } from "@mui/material";
+
+import { Toaster } from "react-hot-toast";
+
+import getTheme from "../theme";
 
 const ThemeContext =
     createContext();
@@ -67,14 +70,11 @@ export const CustomThemeProvider =
         const theme =
             useMemo(
                 () =>
-                    createTheme({
-                        palette: {
-                            mode:
-                                darkMode
-                                    ? "dark"
-                                    : "light"
-                        }
-                    }),
+                    getTheme(
+                        darkMode
+                            ? "dark"
+                            : "light"
+                    ),
                 [darkMode]
             );
 
@@ -89,6 +89,13 @@ export const CustomThemeProvider =
                     theme={theme}
                 >
                     <CssBaseline />
+
+                    <Toaster
+                        position="bottom-right"
+                        toastOptions={{
+                            duration: 4000
+                        }}
+                    />
 
                     {
                         children
