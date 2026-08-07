@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: nextalx-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    rootDir: backend/nextalx-api
+    autoDeploy: true
+
+    # The liveness group deliberately excludes the datasource check, so Render's
+    # periodic probes do not keep the serverless database awake.
+    healthCheckPath: /actuator/health/liveness
+
+    envVars:
+      # Set these in the Render dashboard from your Neon connection details.
+      # sync: false means "prompt me, never store in the repo".
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+
+      - key: APP_CORS_ALLOWED_ORIGINS
+        value: https://nextalx.vercel.app
+      - key: JPA_SHOW_SQL
+        value: "false"

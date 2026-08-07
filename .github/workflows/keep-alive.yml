@@ -1,0 +1,37 @@
+name: Keep API awake
+
+on:
+  # Render free web services sleep after 15 minutes of inactivity and take about a
+  # minute to wake up. Pinging every 10 minutes keeps the instance hot.
+  #
+  # The window is 05:00-23:59 UTC (08:00-03:00 Istanbul) rather than around the
+  # clock: the free plan allows 750 instance-hours per workspace per month, and a
+  # 24/7 service burns 744 of them in a 31-day month. Staying awake only during
+  # waking hours costs ~590 and leaves room for redeploys. Change the cron to
+  # "*/10 * * * *" for 24/7, but then keep this as the only free service.
+  schedule:
+    - cron: "*/10 5-23 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping liveness probe
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping
+        env:
+          # Repo variable: Settings > Secrets and variables > Actions > Variables.
+          # e.g. https://nextalx-api.onrender.com
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+        run: |
+          if [ -z "$API_BASE_URL" ]; then
+            echo "::error::API_BASE_URL repository variable is not set."
+            exit 1
+          fi
+          # A cold start can take ~60s, so allow a generous timeout and retry.
+          curl --silent --show-error --fail \
+               --retry 3 --retry-all-errors --retry-delay 15 \
+               --max-time 90 \
+               --output /dev/null --write-out 'HTTP %{http_code} in %{time_total}s\n' \
+               "$API_BASE_URL/actuator/health/liveness"

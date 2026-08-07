@@ -22,7 +22,12 @@ RUN groupadd --system app && useradd --system --gid app --home /app app
 COPY --from=build /app/app.jar app.jar
 USER app
 
-# Railway injects PORT; Spring reads it via server.port=${PORT:8080}.
+# The host injects PORT; Spring reads it via server.port=${PORT:8080}.
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]
+# Tuned for a 512 MB free-tier container: a 75% heap leaves too little room for
+# metaspace and thread stacks, and the parallel collector reserves more than a
+# single-core instance can use. Override JAVA_OPTS on a larger plan.
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=65.0 -XX:+UseSerialGC -Xss512k"
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
