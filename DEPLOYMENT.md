@@ -100,22 +100,34 @@ Render's free instance has 512 MB. The `Dockerfile` sets `JAVA_OPTS="-XX:MaxRAMP
 
 ## 4. Keeping it awake
 
-Render free web services sleep after **15 minutes** of inactivity and take about a minute to wake. For a portfolio link that is the difference between "works" and "looks broken".
+Render free web services sleep after **15 minutes** of inactivity. Measured on this deployment: a warm request returns in **~0.6 s**, a request that has to wake the service takes **~12.6 s**. For a portfolio link that is the difference between "works" and "looks broken".
 
-[`.github/workflows/keep-alive.yml`](.github/workflows/keep-alive.yml) pings `/actuator/health/liveness` every 10 minutes. Set the repository variable it reads:
+The ping target is `/actuator/health/liveness`, never `/actuator/health` — the latter runs the datasource check and would wake Neon on every ping, burning the CU-hour allowance described in section 1.
 
-**Settings → Secrets and variables → Actions → Variables** → `API_BASE_URL` = `https://nextalx-api.onrender.com`
+### Primary: an external pinger
+
+[cron-job.org](https://cron-job.org) drives this. Job settings:
+
+| Field | Value |
+|-------|-------|
+| URL | `https://nextalx-api.onrender.com/actuator/health/liveness` |
+| Schedule | `*/5 5-23 * * *` |
+| Notify on failure | after 3 consecutive failures |
+
+The failure notification turns the keep-alive into free uptime monitoring: three misses in a row means the API is genuinely down, not merely cold.
+
+`5-23` is deliberately robust against the console's timezone handling, which labels a job "UTC" while rendering its next-execution times in browser-local time. Read as UTC it keeps the service awake 08:00–02:59 Istanbul; read as Istanbul, 05:00–23:59. Either way it is 19 hours a day and covers every European working hour — so the ambiguity does not matter. An expression that wraps midnight (`8-23,0-2`) is *not* robust this way: guess the timezone wrong and the service sleeps through the morning.
+
+### Backup: the GitHub Actions workflow
+
+[`.github/workflows/keep-alive.yml`](.github/workflows/keep-alive.yml) does the same thing every 10 minutes, reading the repository variable `API_BASE_URL` (**Settings → Secrets and variables → Actions → Variables**). Keep it as a second line of defence — Actions minutes are free on public repos — but do not rely on it alone:
+
+- **It is best-effort.** On the first hour of this deployment, exactly one of three scheduled slots fired (09:00 ran; 09:10 and 09:20 did not), and the schedule took over an hour to activate at all after the file landed on `main`.
+- **GitHub disables scheduled workflows after 60 days without repository activity**, with no notification. Two quiet months and the pings stop.
 
 ### The quota arithmetic
 
-Render grants **750 instance-hours per workspace per calendar month**. A service kept awake 24/7 burns 744 of them in a 31-day month — under the cap, but with no room for a second free service. The cron therefore runs `*/10 5-23 * * *` (UTC), roughly 590 hours a month. Change it to `*/10 * * * *` for round-the-clock, and then keep this as the workspace's only free service.
-
-### Two things that will silently break this
-
-- **GitHub disables scheduled workflows after 60 days without repository activity.** No commits for two months and the pings stop, with no notification.
-- **`schedule:` is best-effort.** Runs are regularly delayed 5–15 minutes under load, so an occasional cold start slips through the 15-minute window.
-
-If either matters, an external pinger ([cron-job.org](https://cron-job.org), UptimeRobot) fires on time and does not depend on repo activity.
+Render grants **750 instance-hours per workspace per calendar month**. A service kept awake 24/7 burns 744 of them in a 31-day month — under the cap, but with no room for a second free service and no slack for redeploy overlap. The 19-hour window costs roughly 590 instead. If you switch to round-the-clock pinging, keep this as the workspace's only free service.
 
 ---
 
