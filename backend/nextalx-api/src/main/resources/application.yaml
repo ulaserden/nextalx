@@ -9,7 +9,12 @@ spring:
 
     hikari:
       maximum-pool-size: ${DB_POOL_SIZE:5}
-      minimum-idle: 1
+      # Serverless Postgres (Neon) suspends its compute when no client is connected.
+      # Holding an idle connection open would pin it awake and burn the monthly
+      # CU-hour allowance, so let the pool drain all the way to zero between requests.
+      minimum-idle: ${DB_POOL_MIN_IDLE:0}
+      idle-timeout: 60000
+      max-lifetime: 300000
       connection-timeout: 30000
 
   jpa:
