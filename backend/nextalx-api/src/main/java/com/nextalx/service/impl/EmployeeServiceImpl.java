@@ -29,6 +29,22 @@ public class EmployeeServiceImpl
     private final EmployeeMapper employeeMapper;
 
     @Override
+    public EmployeeResponse getEmployee(
+            Long id
+    ) {
+
+        return employeeRepository.findById(id)
+                .map(
+                        employeeMapper::toResponse
+                )
+                .orElseThrow(() ->
+                        new EmployeeNotFoundException(
+                                "Employee not found."
+                        )
+                );
+    }
+
+    @Override
     public EmployeeResponse createEmployee(
             CreateEmployeeRequest request
     ) {

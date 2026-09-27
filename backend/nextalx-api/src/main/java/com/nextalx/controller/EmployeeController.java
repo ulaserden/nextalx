@@ -55,6 +55,16 @@ public class EmployeeController {
         );
     }
 
+    @GetMapping("/{id}")
+    public EmployeeResponse getEmployee(
+            @PathVariable Long id
+    ) {
+
+        return employeeService.getEmployee(
+                id
+        );
+    }
+
     @ResponseStatus(HttpStatus.CREATED)
 
     @PostMapping

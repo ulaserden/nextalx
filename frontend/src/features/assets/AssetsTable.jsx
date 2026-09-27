@@ -12,6 +12,9 @@ import {
 import WarrantyChip
     from "../../components/common/WarrantyChip";
 
+import EntityLink
+    from "../../components/common/EntityLink";
+
 import EditIcon
     from "@mui/icons-material/Edit";
 
@@ -37,7 +40,12 @@ function AssetsTable({
         {
             field: "assetTag",
             headerName: "Asset Tag",
-            width: 120
+            width: 120,
+            renderCell: (params) => (
+                <EntityLink to={`/assets/${params.row.id}`}>
+                    {params.value}
+                </EntityLink>
+            )
         },
 
         {

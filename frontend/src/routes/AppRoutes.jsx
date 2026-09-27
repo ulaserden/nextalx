@@ -26,6 +26,12 @@ const CategoriesPage =
 const AssetsPage =
     lazy(() => import("../pages/AssetsPage"));
 
+const AssetDetailPage =
+    lazy(() => import("../pages/AssetDetailPage"));
+
+const EmployeeDetailPage =
+    lazy(() => import("../pages/EmployeeDetailPage"));
+
 const AssignmentsPage =
     lazy(() => import("../pages/AssignmentsPage"));
 
@@ -79,6 +85,15 @@ function AppRoutes() {
                     />
 
                     <Route
+                        path="/employees/:id"
+                        element={
+                            <Suspense fallback={<PageFallback />}>
+                                <EmployeeDetailPage />
+                            </Suspense>
+                        }
+                    />
+
+                    <Route
                         path="/departments"
                         element={
                             <Suspense fallback={<PageFallback />}>
@@ -101,6 +116,15 @@ function AppRoutes() {
                         element={
                             <Suspense fallback={<PageFallback />}>
                                 <AssetsPage />
+                            </Suspense>
+                        }
+                    />
+
+                    <Route
+                        path="/assets/:id"
+                        element={
+                            <Suspense fallback={<PageFallback />}>
+                                <AssetDetailPage />
                             </Suspense>
                         }
                     />

@@ -18,6 +18,10 @@ public interface AssetService {
             WarrantyStatus warranty
     );
 
+    AssetResponse getAsset(
+            Long id
+    );
+
     AssetResponse createAsset(
             CreateAssetRequest request
     );

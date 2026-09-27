@@ -74,3 +74,15 @@ export const activateEmployee =
 
         return response.data;
     };
+
+export const getEmployee = async (
+    id
+) => {
+
+    const response =
+        await axiosClient.get(
+            `/employees/${id}`
+        );
+
+    return response.data;
+};

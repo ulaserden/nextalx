@@ -83,6 +83,7 @@ The goal is a clean, maintainable and extensible architecture that can evolve in
 - Create and update employees with department, job title, phone and e-mail
 - Activate / deactivate employees; assignment history is preserved for inactive employees
 - Unique e-mail enforced in code and at the database level
+- **Employee detail page** (`/employees/:id`): contact details, currently assigned assets (returnable in place) and assignment history
 
 ### 📦 Category Management
 - Create and update hardware categories (Laptop, Monitor, Phone, Dock, …)
@@ -93,6 +94,7 @@ The goal is a clean, maintainable and extensible architecture that can evolve in
 - Full lifecycle management with explicit status transitions:
   `AVAILABLE` · `ASSIGNED` · `IN_REPAIR` · `RETIRED` · `LOST` · `BROKEN`
 - Unique asset tag and serial number enforced by the database
+- **Asset detail page** (`/assets/:id`): specs, warranty state, current holder and full assignment history
 - Status changes are blocked while an asset has an active assignment
 
 ### 🔄 Assignment Management
@@ -231,9 +233,9 @@ Base URL: `/api/v1` · Interactive docs: `/swagger-ui.html` · OpenAPI JSON: `/v
 |----------|-----------|
 | **Dashboard** | `GET /dashboard/stats` · `GET /dashboard/expiring-warranties?limit=5` |
 | **Departments** | `GET /departments` · `POST /departments` · `PUT /departments/{id}` · `PATCH /departments/{id}/activate` · `PATCH /departments/{id}/deactivate` |
-| **Employees** | `GET /employees` · `POST /employees` · `PUT /employees/{id}` · `PATCH /employees/{id}/activate` · `PATCH /employees/{id}/deactivate` |
+| **Employees** | `GET /employees` · `GET /employees/{id}` · `POST /employees` · `PUT /employees/{id}` · `PATCH /employees/{id}/activate` · `PATCH /employees/{id}/deactivate` |
 | **Categories** | `GET /categories` · `POST /categories` · `PUT /categories/{id}` · `PATCH /categories/{id}/activate` · `PATCH /categories/{id}/deactivate` |
-| **Assets** | `GET /assets` · `POST /assets` · `PUT /assets/{id}` · `PATCH /assets/{id}/available` · `PATCH /assets/{id}/repair` · `PATCH /assets/{id}/retire` · `PATCH /assets/{id}/lost` · `PATCH /assets/{id}/broken` |
+| **Assets** | `GET /assets` · `GET /assets/{id}` · `POST /assets` · `PUT /assets/{id}` · `PATCH /assets/{id}/available` · `PATCH /assets/{id}/repair` · `PATCH /assets/{id}/retire` · `PATCH /assets/{id}/lost` · `PATCH /assets/{id}/broken` |
 | **Assignments** | `GET /assignments` · `POST /assignments` · `PUT /assignments/{id}/return` |
 | **Health** | `GET /actuator/health` · `GET /actuator/health/liveness` · `GET /actuator/health/readiness` |
 
@@ -491,6 +493,7 @@ Proje; sürdürülebilir, geliştirilebilir ve kurumsal ölçeklenebilirlik hede
 - Departman, unvan, telefon ve e-posta bilgileriyle çalışan oluşturma ve güncelleme
 - Aktif / pasif yönetimi; pasif çalışanların zimmet geçmişi korunur
 - Benzersiz e-posta hem kodda hem veritabanında zorunlu
+- **Çalışan detay sayfası** (`/employees/:id`): iletişim bilgileri, üzerindeki cihazlar (sayfadan iade edilebilir) ve zimmet geçmişi
 
 ### 📦 Kategori Yönetimi
 - Donanım kategorileri (Laptop, Monitör, Telefon, Dock, …) oluşturma ve güncelleme
@@ -501,6 +504,7 @@ Proje; sürdürülebilir, geliştirilebilir ve kurumsal ölçeklenebilirlik hede
 - Açık durum geçişleriyle tam yaşam döngüsü yönetimi:
   `AVAILABLE` · `ASSIGNED` · `IN_REPAIR` · `RETIRED` · `LOST` · `BROKEN`
 - Benzersiz varlık etiketi ve seri numarası veritabanı seviyesinde garanti altında
+- **Varlık detay sayfası** (`/assets/:id`): teknik bilgiler, garanti durumu, şu an kimde olduğu ve tüm zimmet geçmişi
 - Aktif zimmeti olan varlığın durumu elle değiştirilemez
 
 ### 🔄 Atama (Zimmet) Yönetimi
@@ -569,9 +573,9 @@ Temel adres: `/api/v1` · Swagger UI: `/swagger-ui.html`
 |--------|-------------|
 | **Dashboard** | `GET /dashboard/stats` · `GET /dashboard/expiring-warranties?limit=5` |
 | **Departmanlar** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/activate` · `PATCH /{id}/deactivate` |
-| **Çalışanlar** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/activate` · `PATCH /{id}/deactivate` |
+| **Çalışanlar** | `GET` · `GET /{id}` · `POST` · `PUT /{id}` · `PATCH /{id}/activate` · `PATCH /{id}/deactivate` |
 | **Kategoriler** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/activate` · `PATCH /{id}/deactivate` |
-| **Varlıklar** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/available` · `/repair` · `/retire` · `/lost` · `/broken` |
+| **Varlıklar** | `GET` · `GET /{id}` · `POST` · `PUT /{id}` · `PATCH /{id}/available` · `/repair` · `/retire` · `/lost` · `/broken` |
 | **Atamalar** | `GET` · `POST` · `PUT /{id}/return` |
 
 - Liste uç noktaları isteğe bağlı `search` (içerir araması) ve filtre parametreleri alır: `status`, `categoryId` (varlıklar), `departmentId` (çalışanlar), `warranty` (varlıklar: `EXPIRING` / `EXPIRED` / `VALID`), `employeeId` / `assetId` (zimmetler). Örnek: `GET /api/v1/assets?search=thinkpad&status=AVAILABLE`

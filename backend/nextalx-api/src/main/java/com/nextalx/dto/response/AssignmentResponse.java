@@ -19,6 +19,8 @@ public class AssignmentResponse {
 
     private String assetTag;
 
+    private String assetName;
+
     private LocalDate assignedDate;
 
     private LocalDate expectedReturnDate;
