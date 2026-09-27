@@ -6,6 +6,7 @@ import com.nextalx.dto.response.AssetResponse;
 import com.nextalx.entity.Asset;
 import com.nextalx.entity.Category;
 import com.nextalx.enums.AssetStatus;
+import com.nextalx.enums.WarrantyStatus;
 import com.nextalx.exception.AssetAlreadyExistsException;
 import com.nextalx.exception.AssetNotFoundException;
 import com.nextalx.exception.CategoryNotFoundException;
@@ -14,6 +15,7 @@ import com.nextalx.repository.AssetRepository;
 import com.nextalx.repository.AssignmentRepository;
 import com.nextalx.repository.CategoryRepository;
 import com.nextalx.service.AssetService;
+import com.nextalx.service.WarrantyPolicy;
 import com.nextalx.specification.AssetSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,7 @@ public class AssetServiceImpl
     private final CategoryRepository categoryRepository;
     private final AssignmentRepository assignmentRepository;
     private final AssetMapper assetMapper;
+    private final WarrantyPolicy warrantyPolicy;
 
     @Override
     public Page<AssetResponse> getAllAssets(
@@ -37,11 +40,13 @@ public class AssetServiceImpl
             int size,
             String search,
             AssetStatus status,
-            Long categoryId
+            Long categoryId,
+            WarrantyStatus warranty
     ) {
 
         return assetRepository.findAll(
-                        AssetSpecifications.withFilters(search, status, categoryId),
+                        AssetSpecifications.withFilters(search, status, categoryId)
+                                .and(warrantyPolicy.matching(warranty)),
                         PageRequest.of(
                                 page,
                                 size,

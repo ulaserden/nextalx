@@ -5,8 +5,12 @@ import {
 import {
     Paper,
     IconButton,
-    Stack
+    Stack,
+    Tooltip
 } from "@mui/material";
+
+import WarrantyChip
+    from "../../components/common/WarrantyChip";
 
 import EditIcon
     from "@mui/icons-material/Edit";
@@ -82,6 +86,43 @@ function AssetsTable({
             field: "status",
             headerName: "Status",
             flex: 1
+        },
+
+        {
+            field: "warrantyEndDate",
+            headerName: "Warranty",
+            flex: 1.3,
+            minWidth: 190,
+
+            // Expired / expiring warranties get a coloured badge (end date in
+            // the tooltip); everything else just shows the end date.
+            renderCell: (params) => {
+
+                const {
+                    warrantyEndDate,
+                    warrantyStatus,
+                    warrantyDaysRemaining
+                } = params.row;
+
+                if (
+                    warrantyStatus === "EXPIRED" ||
+                    warrantyStatus === "EXPIRING"
+                ) {
+
+                    return (
+                        <Tooltip title={`Warranty ends ${warrantyEndDate}`}>
+                            <span>
+                                <WarrantyChip
+                                    status={warrantyStatus}
+                                    daysRemaining={warrantyDaysRemaining}
+                                />
+                            </span>
+                        </Tooltip>
+                    );
+                }
+
+                return warrantyEndDate || "—";
+            }
         },
 
         {

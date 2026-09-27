@@ -6,7 +6,8 @@ export const getAssets = async ({
     size = 10,
     search,
     status,
-    categoryId
+    categoryId,
+    warranty
 } = {}) => {
 
     const response =
@@ -18,7 +19,8 @@ export const getAssets = async ({
                     size,
                     search: search || undefined,
                     status: status || undefined,
-                    categoryId: categoryId || undefined
+                    categoryId: categoryId || undefined,
+                    warranty: warranty || undefined
                 }
             }
         );

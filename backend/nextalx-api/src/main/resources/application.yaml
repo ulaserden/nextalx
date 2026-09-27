@@ -40,6 +40,11 @@ app:
   # requests to /api/v1/** must send a matching X-API-Key header.
   api-key: ${API_KEY:}
 
+  warranty:
+    # Warranties ending within this many days are reported as "expiring"
+    # (dashboard alert, asset list filter and warrantyStatus field).
+    expiring-within-days: ${WARRANTY_EXPIRING_WITHIN_DAYS:90}
+
 server:
   port: ${PORT:8080}
   shutdown: graceful

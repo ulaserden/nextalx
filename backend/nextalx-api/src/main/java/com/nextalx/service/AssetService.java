@@ -4,6 +4,7 @@ import com.nextalx.dto.request.CreateAssetRequest;
 import com.nextalx.dto.request.UpdateAssetRequest;
 import com.nextalx.dto.response.AssetResponse;
 import com.nextalx.enums.AssetStatus;
+import com.nextalx.enums.WarrantyStatus;
 import org.springframework.data.domain.Page;
 
 public interface AssetService {
@@ -13,7 +14,8 @@ public interface AssetService {
             int size,
             String search,
             AssetStatus status,
-            Long categoryId
+            Long categoryId,
+            WarrantyStatus warranty
     );
 
     AssetResponse createAsset(

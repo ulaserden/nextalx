@@ -26,6 +26,18 @@ public class AssetResponse {
 
     private LocalDate warrantyEndDate;
 
+    /**
+     * VALID, EXPIRING or EXPIRED; null when the asset has no warranty end
+     * date or is out of service (RETIRED, LOST). See WarrantyPolicy.
+     */
+    private String warrantyStatus;
+
+    /**
+     * Days until the warranty ends (negative once expired); null whenever
+     * warrantyStatus is null.
+     */
+    private Long warrantyDaysRemaining;
+
     private BigDecimal purchasePrice;
 
     private String supplier;
