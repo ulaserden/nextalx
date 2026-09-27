@@ -60,10 +60,9 @@ function EmployeeDialog({
             async () => {
 
                 const response =
-                    await getDepartments(
-                        0,
-                        100
-                    );
+                    await getDepartments({
+                        size: 100
+                    });
 
                 setDepartments(
                     response.content

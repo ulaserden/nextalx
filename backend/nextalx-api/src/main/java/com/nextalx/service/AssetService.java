@@ -3,13 +3,17 @@ package com.nextalx.service;
 import com.nextalx.dto.request.CreateAssetRequest;
 import com.nextalx.dto.request.UpdateAssetRequest;
 import com.nextalx.dto.response.AssetResponse;
+import com.nextalx.enums.AssetStatus;
 import org.springframework.data.domain.Page;
 
 public interface AssetService {
 
     Page<AssetResponse> getAllAssets(
             int page,
-            int size
+            int size,
+            String search,
+            AssetStatus status,
+            Long categoryId
     );
 
     AssetResponse createAsset(

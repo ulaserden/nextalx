@@ -9,7 +9,9 @@ public interface DepartmentService {
 
     Page<DepartmentResponse> getAllDepartments(
             int page,
-            int size
+            int size,
+            String search,
+            String status
     );
 
     DepartmentResponse createDepartment(

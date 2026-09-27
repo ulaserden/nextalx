@@ -2,6 +2,7 @@ package com.nextalx.controller;
 
 import com.nextalx.dto.request.CreateAssignmentRequest;
 import com.nextalx.dto.response.AssignmentResponse;
+import com.nextalx.enums.AssignmentStatus;
 import com.nextalx.service.AssignmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +28,36 @@ public class AssignmentController {
             @RequestParam(
                     defaultValue = "10"
             )
-            int size
+            int size,
+
+            @RequestParam(
+                    required = false
+            )
+            String search,
+
+            @RequestParam(
+                    required = false
+            )
+            AssignmentStatus status,
+
+            @RequestParam(
+                    required = false
+            )
+            Long employeeId,
+
+            @RequestParam(
+                    required = false
+            )
+            Long assetId
     ) {
 
         return assignmentService.getAllAssignments(
                 page,
-                size
+                size,
+                search,
+                status,
+                employeeId,
+                assetId
         );
     }
 

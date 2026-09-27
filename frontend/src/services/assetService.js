@@ -1,13 +1,26 @@
 import axiosClient from "../api/axiosClient";
 
-export const getAssets = async (
+// Empty filters are sent as undefined so axios leaves them out of the query.
+export const getAssets = async ({
     page = 0,
-    size = 10
-) => {
+    size = 10,
+    search,
+    status,
+    categoryId
+} = {}) => {
 
     const response =
         await axiosClient.get(
-            `/assets?page=${page}&size=${size}`
+            "/assets",
+            {
+                params: {
+                    page,
+                    size,
+                    search: search || undefined,
+                    status: status || undefined,
+                    categoryId: categoryId || undefined
+                }
+            }
         );
 
     return response.data;

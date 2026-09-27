@@ -9,9 +9,11 @@ import com.nextalx.exception.CategoryNotFoundException;
 import com.nextalx.mapper.CategoryMapper;
 import com.nextalx.repository.CategoryRepository;
 import com.nextalx.service.CategoryService;
+import com.nextalx.specification.NamedEntitySpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,13 +27,17 @@ public class CategoryServiceImpl
     @Override
     public Page<CategoryResponse> getAllCategories(
             int page,
-            int size
+            int size,
+            String search,
+            String status
     ) {
 
         return categoryRepository.findAll(
+                        NamedEntitySpecifications.withFilters(search, status),
                         PageRequest.of(
                                 page,
-                                size
+                                size,
+                                Sort.by("id")
                         )
                 )
                 .map(

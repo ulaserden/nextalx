@@ -12,9 +12,11 @@ import com.nextalx.mapper.EmployeeMapper;
 import com.nextalx.repository.DepartmentRepository;
 import com.nextalx.repository.EmployeeRepository;
 import com.nextalx.service.EmployeeService;
+import com.nextalx.specification.EmployeeSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -188,13 +190,18 @@ public class EmployeeServiceImpl
     @Override
     public Page<EmployeeResponse> getAllEmployees(
             int page,
-            int size
+            int size,
+            String search,
+            String status,
+            Long departmentId
     ) {
 
         return employeeRepository.findAll(
+                        EmployeeSpecifications.withFilters(search, status, departmentId),
                         PageRequest.of(
                                 page,
-                                size
+                                size,
+                                Sort.by("id")
                         )
                 )
                 .map(

@@ -104,6 +104,7 @@ The goal is a clean, maintainable and extensible architecture that can evolve in
 - Material UI interface with **dark mode** (persisted in `localStorage`)
 - Fully **mobile-responsive** layout with collapsible sidebar
 - Server-side pagination with MUI Data Grid
+- Search and filtering on every list page (debounced search box, status and department / category filters; Turkish-aware, case-insensitive)
 - Client-side form validation plus backend error messages surfaced via toast notifications
 - Route-level code splitting and vendor chunking for fast first load
 - Proper 404 page and active navigation highlighting
@@ -236,6 +237,16 @@ Base URL: `/api/v1` · Interactive docs: `/swagger-ui.html` · OpenAPI JSON: `/v
 | **Health** | `GET /actuator/health` · `GET /actuator/health/liveness` · `GET /actuator/health/readiness` |
 
 - List endpoints are paginated: `?page=0&size=10` (Spring `Page<T>` response).
+- List endpoints accept optional filters; `search` is a case-insensitive "contains" match:
+
+  | Endpoint | `search` matches | Other filters |
+  |----------|------------------|---------------|
+  | `GET /assets` | tag, name, brand, model, serial number, supplier | `status`, `categoryId` |
+  | `GET /employees` | full name, e-mail, phone, job title | `status`, `departmentId` |
+  | `GET /departments`, `GET /categories` | name, description | `status` |
+  | `GET /assignments` | employee name / e-mail, asset tag / name / serial | `status`, `employeeId`, `assetId` |
+
+  Example: `GET /api/v1/assets?search=thinkpad&status=AVAILABLE&page=0&size=10`
 - `POST` returns `201 Created`; validation errors return `400`; missing resources `404`; conflicts (duplicates, invalid state transitions) `409`.
 - Error body:
 
@@ -498,6 +509,7 @@ Proje; sürdürülebilir, geliştirilebilir ve kurumsal ölçeklenebilirlik hede
 - Material UI arayüzü ve **karanlık mod** (tercih `localStorage`'da saklanır)
 - Daraltılabilir kenar çubuğu ile tamamen **mobil uyumlu** tasarım
 - MUI Data Grid ile sunucu taraflı sayfalama
+- Tüm liste sayfalarında arama ve filtreleme (gecikmeli arama kutusu, durum ve departman / kategori filtreleri; büyük-küçük harf duyarsız, Türkçe karakter uyumlu)
 - İstemci tarafı form doğrulama ve backend hata mesajlarının toast bildirimi olarak gösterimi
 - Rota bazlı code splitting ve vendor chunk ayrımı ile hızlı ilk açılış
 - 404 sayfası ve aktif menü vurgusu
@@ -558,6 +570,7 @@ Temel adres: `/api/v1` · Swagger UI: `/swagger-ui.html`
 | **Varlıklar** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/available` · `/repair` · `/retire` · `/lost` · `/broken` |
 | **Atamalar** | `GET` · `POST` · `PUT /{id}/return` |
 
+- Liste uç noktaları isteğe bağlı `search` (içerir araması) ve filtre parametreleri alır: `status`, `categoryId` (varlıklar), `departmentId` (çalışanlar), `employeeId` / `assetId` (zimmetler). Örnek: `GET /api/v1/assets?search=thinkpad&status=AVAILABLE`
 - Liste uç noktaları sayfalıdır: `?page=0&size=10`
 - `POST` → `201 Created`; doğrulama hatası → `400`; bulunamadı → `404`; çakışma / geçersiz durum geçişi → `409`
 - Bilinçli olarak **`DELETE` uç noktası yoktur**; silme yerine pasifleştirme veya yaşam döngüsü durumu kullanılır.

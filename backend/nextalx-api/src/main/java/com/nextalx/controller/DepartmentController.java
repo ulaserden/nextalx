@@ -28,13 +28,24 @@ public class DepartmentController {
             @RequestParam(
                     defaultValue = "10"
             )
-            int size
+            int size,
 
+            @RequestParam(
+                    required = false
+            )
+            String search,
+
+            @RequestParam(
+                    required = false
+            )
+            String status
     ) {
 
         return departmentService.getAllDepartments(
                 page,
-                size
+                size,
+                search,
+                status
         );
     }
 

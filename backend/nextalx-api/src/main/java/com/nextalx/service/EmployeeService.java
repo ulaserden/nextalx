@@ -26,6 +26,9 @@ public interface EmployeeService {
 
     Page<EmployeeResponse> getAllEmployees(
             int page,
-            int size
+            int size,
+            String search,
+            String status,
+            Long departmentId
     );
 }

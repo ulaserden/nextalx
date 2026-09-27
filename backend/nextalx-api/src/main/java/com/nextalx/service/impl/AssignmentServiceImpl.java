@@ -16,9 +16,11 @@ import com.nextalx.repository.AssetRepository;
 import com.nextalx.repository.AssignmentRepository;
 import com.nextalx.repository.EmployeeRepository;
 import com.nextalx.service.AssignmentService;
+import com.nextalx.specification.AssignmentSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,13 +40,19 @@ public class AssignmentServiceImpl
     @Override
     public Page<AssignmentResponse> getAllAssignments(
             int page,
-            int size
+            int size,
+            String search,
+            AssignmentStatus status,
+            Long employeeId,
+            Long assetId
     ) {
 
         return assignmentRepository.findAll(
+                        AssignmentSpecifications.withFilters(search, status, employeeId, assetId),
                         PageRequest.of(
                                 page,
-                                size
+                                size,
+                                Sort.by("id")
                         )
                 )
                 .map(

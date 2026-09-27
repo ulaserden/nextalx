@@ -3,6 +3,7 @@ package com.nextalx.controller;
 import com.nextalx.dto.request.CreateAssetRequest;
 import com.nextalx.dto.request.UpdateAssetRequest;
 import com.nextalx.dto.response.AssetResponse;
+import com.nextalx.enums.AssetStatus;
 import com.nextalx.service.AssetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,30 @@ public class AssetController {
             @RequestParam(
                     defaultValue = "10"
             )
-            int size
+            int size,
+
+            @RequestParam(
+                    required = false
+            )
+            String search,
+
+            @RequestParam(
+                    required = false
+            )
+            AssetStatus status,
+
+            @RequestParam(
+                    required = false
+            )
+            Long categoryId
     ) {
 
         return assetService.getAllAssets(
                 page,
-                size
+                size,
+                search,
+                status,
+                categoryId
         );
     }
 

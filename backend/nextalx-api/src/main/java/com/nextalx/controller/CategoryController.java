@@ -19,16 +19,33 @@ public class CategoryController {
 
     @GetMapping
     public Page<CategoryResponse> getAllCategories(
-            @RequestParam(defaultValue = "0")
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
             int page,
 
-            @RequestParam(defaultValue = "10")
-            int size
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size,
+
+            @RequestParam(
+                    required = false
+            )
+            String search,
+
+            @RequestParam(
+                    required = false
+            )
+            String status
     ) {
 
         return categoryService.getAllCategories(
                 page,
-                size
+                size,
+                search,
+                status
         );
     }
 

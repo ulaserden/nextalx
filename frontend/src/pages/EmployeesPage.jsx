@@ -6,11 +6,30 @@ import {
 import {
     Box,
     Button,
-    CircularProgress,
     Typography
 } from "@mui/material";
 
 import toast from "react-hot-toast";
+
+import ListFilterBar
+    from "../components/common/ListFilterBar";
+
+import SelectFilter
+    from "../components/common/SelectFilter";
+
+import useDebouncedValue
+    from "../hooks/useDebouncedValue";
+
+import useServerList
+    from "../hooks/useServerList";
+
+import {
+    ACTIVE_STATUS_OPTIONS
+} from "../constants/filterOptions";
+
+import {
+    getDepartments
+} from "../services/departmentService";
 
 import EmployeesTable
     from "../features/employees/EmployeesTable";
@@ -28,12 +47,6 @@ import {
 
 function EmployeesPage() {
 
-    const [employees, setEmployees] =
-        useState([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
     const [dialogOpen, setDialogOpen] =
         useState(false);
 
@@ -41,37 +54,63 @@ function EmployeesPage() {
         setSelectedEmployee] =
         useState(null);
 
-    const fetchEmployees =
-        async () => {
+    const [search, setSearch] =
+        useState("");
 
-            try {
+    const [statusFilter, setStatusFilter] =
+        useState("");
 
-                const response =
-                    await getEmployees(
-                        0,
-                        100
-                    );
+    const [departmentIdFilter, setDepartmentIdFilter] =
+        useState("");
 
-                setEmployees(
-                    response.content
-                );
+    const [departmentOptions, setDepartmentOptions] =
+        useState([]);
 
-            } catch (error) {
+    const debouncedSearch =
+        useDebouncedValue(search);
 
-                toast.error(
-                    error?.userMessage ||
-                    "Employees could not be loaded."
-                );
+    const {
+        tableProps,
+        reload
+    } = useServerList(
+        getEmployees,
+        {
+            search: debouncedSearch.trim(),
+            status: statusFilter,
+            departmentId: departmentIdFilter
+        },
+        "Employees could not be loaded."
+    );
 
-            } finally {
+    const hasActiveFilters =
+        Boolean(search || statusFilter || departmentIdFilter);
 
-                setLoading(false);
-            }
-        };
+    const clearFilters = () => {
 
+        setSearch("");
+
+        setStatusFilter("");
+
+        setDepartmentIdFilter("");
+    };
+
+    // Options for the department filter dropdown.
     useEffect(() => {
 
-        fetchEmployees();
+        getDepartments({
+            size: 100
+        })
+            .then((data) =>
+                setDepartmentOptions(
+                    data.content.map((item) => ({
+                        value: item.id,
+                        label: item.name
+                    }))
+                )
+            )
+            .catch(() => {
+                // the filter just stays empty; the list itself still loads
+            });
 
     }, []);
 
@@ -86,7 +125,7 @@ function EmployeesPage() {
 
                 setDialogOpen(false);
 
-                await fetchEmployees();
+                reload();
 
                 toast.success(
                     "Employee created successfully."
@@ -115,7 +154,7 @@ function EmployeesPage() {
 
                 setSelectedEmployee(null);
 
-                await fetchEmployees();
+                reload();
 
                 toast.success(
                     "Employee updated successfully."
@@ -148,7 +187,7 @@ function EmployeesPage() {
                     employee.id
                 );
 
-                await fetchEmployees();
+                reload();
 
                 toast.success(
                     "Employee deactivated successfully."
@@ -172,7 +211,7 @@ function EmployeesPage() {
                     employee.id
                 );
 
-                await fetchEmployees();
+                reload();
 
                 toast.success(
                     "Employee activated successfully."
@@ -186,21 +225,6 @@ function EmployeesPage() {
                 );
             }
         };
-
-    if (loading) {
-
-        return (
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 5
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
 
     return (
         <Box>
@@ -236,8 +260,31 @@ function EmployeesPage() {
                 </Button>
             </Box>
 
+            <ListFilterBar
+                search={search}
+                onSearchChange={setSearch}
+                searchPlaceholder="Search by name, email, phone or job title"
+                hasActiveFilters={hasActiveFilters}
+                onClear={clearFilters}
+            >
+                <SelectFilter
+                    label="Status"
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={ACTIVE_STATUS_OPTIONS}
+                />
+
+                <SelectFilter
+                    label="Department"
+                    value={departmentIdFilter}
+                    onChange={setDepartmentIdFilter}
+                    options={departmentOptions}
+                    allLabel="All departments"
+                />
+            </ListFilterBar>
+
             <EmployeesTable
-                employees={employees}
+                {...tableProps}
                 onEdit={(employee) => {
 
                     setSelectedEmployee(employee);

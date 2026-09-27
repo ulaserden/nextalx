@@ -1,16 +1,30 @@
 import {
-    useEffect,
     useState
 } from "react";
 
 import {
     Box,
     Button,
-    CircularProgress,
     Typography
 } from "@mui/material";
 
 import toast from "react-hot-toast";
+
+import ListFilterBar
+    from "../components/common/ListFilterBar";
+
+import SelectFilter
+    from "../components/common/SelectFilter";
+
+import useDebouncedValue
+    from "../hooks/useDebouncedValue";
+
+import useServerList
+    from "../hooks/useServerList";
+
+import {
+    ACTIVE_STATUS_OPTIONS
+} from "../constants/filterOptions";
 
 import CategoriesTable
     from "../features/categories/CategoriesTable";
@@ -28,12 +42,6 @@ import {
 
 function CategoriesPage() {
 
-    const [categories, setCategories] =
-        useState([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
     const [dialogOpen, setDialogOpen] =
         useState(false);
 
@@ -41,39 +49,36 @@ function CategoriesPage() {
         setSelectedCategory] =
         useState(null);
 
-    const fetchCategories =
-        async () => {
+    const [search, setSearch] =
+        useState("");
 
-            try {
+    const [statusFilter, setStatusFilter] =
+        useState("");
 
-                const response =
-                    await getCategories(
-                        0,
-                        100
-                    );
+    const debouncedSearch =
+        useDebouncedValue(search);
 
-                setCategories(
-                    response.content
-                );
+    const {
+        tableProps,
+        reload
+    } = useServerList(
+        getCategories,
+        {
+            search: debouncedSearch.trim(),
+            status: statusFilter
+        },
+        "Categories could not be loaded."
+    );
 
-            } catch (error) {
+    const hasActiveFilters =
+        Boolean(search || statusFilter);
 
-                toast.error(
-                    error?.userMessage ||
-                    "Categories could not be loaded."
-                );
+    const clearFilters = () => {
 
-            } finally {
+        setSearch("");
 
-                setLoading(false);
-            }
-        };
-
-    useEffect(() => {
-
-        fetchCategories();
-
-    }, []);
+        setStatusFilter("");
+    };
 
     const handleCreateCategory =
         async (categoryData) => {
@@ -86,7 +91,7 @@ function CategoriesPage() {
 
                 setDialogOpen(false);
 
-                await fetchCategories();
+                reload();
 
                 toast.success(
                     "Category created successfully."
@@ -115,7 +120,7 @@ function CategoriesPage() {
 
                 setSelectedCategory(null);
 
-                await fetchCategories();
+                reload();
 
                 toast.success(
                     "Category updated successfully."
@@ -139,7 +144,7 @@ function CategoriesPage() {
                     category.id
                 );
 
-                await fetchCategories();
+                reload();
 
                 toast.success(
                     "Category deactivated successfully."
@@ -163,7 +168,7 @@ function CategoriesPage() {
                     category.id
                 );
 
-                await fetchCategories();
+                reload();
 
                 toast.success(
                     "Category activated successfully."
@@ -177,21 +182,6 @@ function CategoriesPage() {
                 );
             }
         };
-
-    if (loading) {
-
-        return (
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 5
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
 
     return (
         <Box>
@@ -227,8 +217,23 @@ function CategoriesPage() {
                 </Button>
             </Box>
 
+            <ListFilterBar
+                search={search}
+                onSearchChange={setSearch}
+                searchPlaceholder="Search by name or description"
+                hasActiveFilters={hasActiveFilters}
+                onClear={clearFilters}
+            >
+                <SelectFilter
+                    label="Status"
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={ACTIVE_STATUS_OPTIONS}
+                />
+            </ListFilterBar>
+
             <CategoriesTable
-                categories={categories}
+                {...tableProps}
                 onEdit={(category) => {
 
                     setSelectedCategory(category);
