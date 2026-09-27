@@ -63,6 +63,16 @@ public class AssetController {
         );
     }
 
+    @GetMapping("/{id}")
+    public AssetResponse getAsset(
+            @PathVariable Long id
+    ) {
+
+        return assetService.getAsset(
+                id
+        );
+    }
+
     @ResponseStatus(HttpStatus.CREATED)
 
     @PostMapping

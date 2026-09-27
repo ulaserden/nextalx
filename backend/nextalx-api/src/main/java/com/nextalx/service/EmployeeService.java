@@ -7,6 +7,10 @@ import org.springframework.data.domain.Page;
 
 public interface EmployeeService {
 
+    EmployeeResponse getEmployee(
+            Long id
+    );
+
     EmployeeResponse createEmployee(
             CreateEmployeeRequest request
     );

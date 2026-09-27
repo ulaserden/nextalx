@@ -52,7 +52,13 @@ public class AssignmentServiceImpl
                         PageRequest.of(
                                 page,
                                 size,
-                                Sort.by("id")
+                                // newest first: this list doubles as the
+                                // assignment history of an asset / employee
+                                Sort.by(
+                                        Sort.Direction.DESC,
+                                        "assignedDate",
+                                        "id"
+                                )
                         )
                 )
                 .map(

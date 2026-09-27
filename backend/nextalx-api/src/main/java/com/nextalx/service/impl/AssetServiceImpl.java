@@ -59,6 +59,22 @@ public class AssetServiceImpl
     }
 
     @Override
+    public AssetResponse getAsset(
+            Long id
+    ) {
+
+        return assetRepository.findById(id)
+                .map(
+                        assetMapper::toResponse
+                )
+                .orElseThrow(() ->
+                        new AssetNotFoundException(
+                                "Asset not found."
+                        )
+                );
+    }
+
+    @Override
     public AssetResponse createAsset(
             CreateAssetRequest request
     ) {

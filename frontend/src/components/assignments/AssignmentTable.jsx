@@ -7,25 +7,45 @@ import {
     Paper
 } from "@mui/material";
 
+import EntityLink
+    from "../common/EntityLink";
+
 function AssignmentTable({
     rows,
     rowCount,
     loading,
     paginationModel,
     onPaginationModelChange,
-    onReturn
+    onReturn,
+    // e.g. ["assetTag", "assetName"] on an asset's own history
+    hiddenFields = []
 }) {
 
-    const columns = [
+    const allColumns = [
         {
             field: "employeeName",
             headerName: "Employee",
-            flex: 1.3
+            flex: 1.3,
+            renderCell: (params) => (
+                <EntityLink to={`/employees/${params.row.employeeId}`}>
+                    {params.value}
+                </EntityLink>
+            )
         },
         {
             field: "assetTag",
             headerName: "Asset",
-            flex: 1
+            flex: 1,
+            renderCell: (params) => (
+                <EntityLink to={`/assets/${params.row.assetId}`}>
+                    {params.value}
+                </EntityLink>
+            )
+        },
+        {
+            field: "assetName",
+            headerName: "Asset Name",
+            flex: 1.3
         },
         {
             field: "assignedDate",
@@ -71,6 +91,11 @@ function AssignmentTable({
             )
         }
     ];
+
+    const columns =
+        allColumns.filter(
+            (column) => !hiddenFields.includes(column.field)
+        );
 
     return (
         <Paper

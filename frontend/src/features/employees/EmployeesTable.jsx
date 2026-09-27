@@ -17,6 +17,9 @@ import BlockIcon
 import CheckCircleIcon
     from "@mui/icons-material/CheckCircle";
 
+import EntityLink
+    from "../../components/common/EntityLink";
+
 function EmployeesTable({
     rows,
     rowCount,
@@ -39,7 +42,12 @@ function EmployeesTable({
             headerName: "Name",
             flex: 1,
             valueGetter: (_, row) =>
-                `${row.firstName} ${row.lastName}`
+                `${row.firstName} ${row.lastName}`,
+            renderCell: (params) => (
+                <EntityLink to={`/employees/${params.row.id}`}>
+                    {params.value}
+                </EntityLink>
+            )
         },
         {
             field: "email",

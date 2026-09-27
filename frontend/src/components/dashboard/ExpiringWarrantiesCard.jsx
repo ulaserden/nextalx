@@ -17,6 +17,9 @@ import {
 import WarrantyChip
     from "../common/WarrantyChip";
 
+import EntityLink
+    from "../common/EntityLink";
+
 // Soonest upcoming warranty expirations, with a link to the full list.
 function ExpiringWarrantiesCard({
     assets,
@@ -90,7 +93,11 @@ function ExpiringWarrantiesCard({
                                                 }
                                             >
                                                 <ListItemText
-                                                    primary={`${asset.assetTag} · ${asset.name}`}
+                                                    primary={
+                                                        <EntityLink to={`/assets/${asset.id}`}>
+                                                            {`${asset.assetTag} · ${asset.name}`}
+                                                        </EntityLink>
+                                                    }
                                                     secondary={`${asset.categoryName} · ends ${asset.warrantyEndDate}`}
                                                     sx={{
                                                         pr: 16

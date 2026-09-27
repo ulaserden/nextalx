@@ -69,6 +69,9 @@ public class AssignmentMapper {
                 .assetTag(
                         assignment.getAsset().getAssetTag()
                 )
+                .assetName(
+                        assignment.getAsset().getName()
+                )
                 .assignedDate(
                         assignment.getAssignedDate()
                 )

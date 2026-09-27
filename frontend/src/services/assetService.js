@@ -109,3 +109,15 @@ export const setAssetBroken =
 
         return response.data;
     };
+
+export const getAsset = async (
+    id
+) => {
+
+    const response =
+        await axiosClient.get(
+            `/assets/${id}`
+        );
+
+    return response.data;
+};
