@@ -15,6 +15,12 @@ export const ASSET_STATUS_OPTIONS = [
     { value: "RETIRED", label: "Retired" }
 ];
 
+export const WARRANTY_STATUS_OPTIONS = [
+    { value: "EXPIRING", label: "Expiring soon" },
+    { value: "EXPIRED", label: "Expired" },
+    { value: "VALID", label: "Valid" }
+];
+
 export const ASSIGNMENT_STATUS_OPTIONS = [
     { value: "ACTIVE", label: "Active" },
     { value: "RETURNED", label: "Returned" }

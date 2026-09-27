@@ -72,6 +72,7 @@ The goal is a clean, maintainable and extensible architecture that can evolve in
 ### 📊 Dashboard
 - Total employees, total assets, assigned assets and available assets at a glance
 - Fast, single-endpoint statistics (`GET /api/v1/dashboard/stats`)
+- **Warranty alerts:** counts of expired and soon-to-expire warranties (next 90 days by default) with a list of the next expirations; each card opens the asset list pre-filtered
 
 ### 🏢 Department Management
 - Create and update departments
@@ -228,7 +229,7 @@ Base URL: `/api/v1` · Interactive docs: `/swagger-ui.html` · OpenAPI JSON: `/v
 
 | Resource | Endpoints |
 |----------|-----------|
-| **Dashboard** | `GET /dashboard/stats` |
+| **Dashboard** | `GET /dashboard/stats` · `GET /dashboard/expiring-warranties?limit=5` |
 | **Departments** | `GET /departments` · `POST /departments` · `PUT /departments/{id}` · `PATCH /departments/{id}/activate` · `PATCH /departments/{id}/deactivate` |
 | **Employees** | `GET /employees` · `POST /employees` · `PUT /employees/{id}` · `PATCH /employees/{id}/activate` · `PATCH /employees/{id}/deactivate` |
 | **Categories** | `GET /categories` · `POST /categories` · `PUT /categories/{id}` · `PATCH /categories/{id}/activate` · `PATCH /categories/{id}/deactivate` |
@@ -241,12 +242,13 @@ Base URL: `/api/v1` · Interactive docs: `/swagger-ui.html` · OpenAPI JSON: `/v
 
   | Endpoint | `search` matches | Other filters |
   |----------|------------------|---------------|
-  | `GET /assets` | tag, name, brand, model, serial number, supplier | `status`, `categoryId` |
+  | `GET /assets` | tag, name, brand, model, serial number, supplier | `status`, `categoryId`, `warranty` (`EXPIRING` / `EXPIRED` / `VALID`) |
   | `GET /employees` | full name, e-mail, phone, job title | `status`, `departmentId` |
   | `GET /departments`, `GET /categories` | name, description | `status` |
   | `GET /assignments` | employee name / e-mail, asset tag / name / serial | `status`, `employeeId`, `assetId` |
 
   Example: `GET /api/v1/assets?search=thinkpad&status=AVAILABLE&page=0&size=10`
+- Asset responses include `warrantyStatus` (`VALID` / `EXPIRING` / `EXPIRED`) and `warrantyDaysRemaining` (negative once expired). Both are `null` for assets without a warranty end date or out of service (`RETIRED`, `LOST`).
 - `POST` returns `201 Created`; validation errors return `400`; missing resources `404`; conflicts (duplicates, invalid state transitions) `409`.
 - Error body:
 
@@ -378,6 +380,7 @@ docker run -p 8080:8080 \
 | `PORT` | `8080` | HTTP port |
 | `APP_CORS_ALLOWED_ORIGINS` | `http://localhost:5173,5174,5175` | Comma-separated allowed origins |
 | `API_KEY` | *(empty = disabled)* | When set, `/api/v1/**` requires `X-API-Key` |
+| `WARRANTY_EXPIRING_WITHIN_DAYS` | `90` | Warranties ending within this many days count as "expiring" |
 | `DB_POOL_SIZE` | `5` | Hikari max pool size |
 | `DB_POOL_MIN_IDLE` | `0` | Hikari min idle (0 lets serverless DBs suspend) |
 | `JPA_SHOW_SQL` | `false` | Log SQL |
@@ -477,6 +480,7 @@ Proje; sürdürülebilir, geliştirilebilir ve kurumsal ölçeklenebilirlik hede
 ### 📊 Dashboard
 - Toplam çalışan, toplam varlık, atanmış varlık ve kullanılabilir varlık sayıları
 - Tek istekle istatistikler (`GET /api/v1/dashboard/stats`)
+- **Garanti uyarıları:** süresi dolmuş ve yakında dolacak (varsayılan 90 gün) garanti sayıları ile en yakın bitişlerin listesi; kartlar filtrelenmiş varlık listesini açar
 
 ### 🏢 Departman Yönetimi
 - Departman oluşturma ve güncelleme
@@ -563,14 +567,14 @@ Temel adres: `/api/v1` · Swagger UI: `/swagger-ui.html`
 
 | Kaynak | Uç noktalar |
 |--------|-------------|
-| **Dashboard** | `GET /dashboard/stats` |
+| **Dashboard** | `GET /dashboard/stats` · `GET /dashboard/expiring-warranties?limit=5` |
 | **Departmanlar** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/activate` · `PATCH /{id}/deactivate` |
 | **Çalışanlar** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/activate` · `PATCH /{id}/deactivate` |
 | **Kategoriler** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/activate` · `PATCH /{id}/deactivate` |
 | **Varlıklar** | `GET` · `POST` · `PUT /{id}` · `PATCH /{id}/available` · `/repair` · `/retire` · `/lost` · `/broken` |
 | **Atamalar** | `GET` · `POST` · `PUT /{id}/return` |
 
-- Liste uç noktaları isteğe bağlı `search` (içerir araması) ve filtre parametreleri alır: `status`, `categoryId` (varlıklar), `departmentId` (çalışanlar), `employeeId` / `assetId` (zimmetler). Örnek: `GET /api/v1/assets?search=thinkpad&status=AVAILABLE`
+- Liste uç noktaları isteğe bağlı `search` (içerir araması) ve filtre parametreleri alır: `status`, `categoryId` (varlıklar), `departmentId` (çalışanlar), `warranty` (varlıklar: `EXPIRING` / `EXPIRED` / `VALID`), `employeeId` / `assetId` (zimmetler). Örnek: `GET /api/v1/assets?search=thinkpad&status=AVAILABLE`
 - Liste uç noktaları sayfalıdır: `?page=0&size=10`
 - `POST` → `201 Created`; doğrulama hatası → `400`; bulunamadı → `404`; çakışma / geçersiz durum geçişi → `409`
 - Bilinçli olarak **`DELETE` uç noktası yoktur**; silme yerine pasifleştirme veya yaşam döngüsü durumu kullanılır.
@@ -624,6 +628,7 @@ Tarayıcıda http://localhost:5173 adresini açın.
 | `SPRING_DATASOURCE_PASSWORD` | `postgre` | Veritabanı şifresi (sadece yerel) |
 | `APP_CORS_ALLOWED_ORIGINS` | `http://localhost:5173,…` | İzin verilen origin'ler (virgülle) |
 | `API_KEY` | *(boş = kapalı)* | Ayarlanırsa `/api/v1/**` için `X-API-Key` zorunlu |
+| `WARRANTY_EXPIRING_WITHIN_DAYS` | `90` | Bu kadar gün içinde biten garantiler "yakında dolacak" sayılır |
 | `VITE_API_URL` (frontend) | `http://localhost:8080/api/v1` | Backend adresi (**build zamanı**) |
 
 ---

@@ -7,3 +7,18 @@ export const getDashboardStats = async () => {
 
     return response.data;
 };
+
+export const getExpiringWarranties = async (
+    limit = 5
+) => {
+    const response = await axiosClient.get(
+        "/dashboard/expiring-warranties",
+        {
+            params: {
+                limit
+            }
+        }
+    );
+
+    return response.data;
+};

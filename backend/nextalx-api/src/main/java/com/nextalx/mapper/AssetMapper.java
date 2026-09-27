@@ -5,10 +5,16 @@ import com.nextalx.dto.response.AssetResponse;
 import com.nextalx.entity.Asset;
 import com.nextalx.entity.Category;
 import com.nextalx.enums.AssetStatus;
+import com.nextalx.enums.WarrantyStatus;
+import com.nextalx.service.WarrantyPolicy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class AssetMapper {
+
+    private final WarrantyPolicy warrantyPolicy;
 
     public Asset toEntity(
             CreateAssetRequest request,
@@ -94,6 +100,12 @@ public class AssetMapper {
                 .warrantyEndDate(
                         asset.getWarrantyEndDate()
                 )
+                .warrantyStatus(
+                        warrantyStatusName(asset)
+                )
+                .warrantyDaysRemaining(
+                        warrantyPolicy.daysRemaining(asset)
+                )
                 .purchasePrice(
                         asset.getPurchasePrice()
                 )
@@ -110,5 +122,17 @@ public class AssetMapper {
                         asset.getCategory().getName()
                 )
                 .build();
+    }
+
+    private String warrantyStatusName(
+            Asset asset
+    ) {
+
+        WarrantyStatus status =
+                warrantyPolicy.statusOf(asset);
+
+        return status == null
+                ? null
+                : status.name();
     }
 }

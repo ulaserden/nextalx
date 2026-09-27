@@ -21,4 +21,11 @@ public class DashboardStatsResponse {
 
     private long availableAssets;
 
+    private long warrantyExpiringAssets;
+
+    private long warrantyExpiredAssets;
+
+    /** Window, in days, that counts as "expiring". */
+    private int warrantyExpiringWithinDays;
+
 }

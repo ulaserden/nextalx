@@ -10,19 +10,33 @@ import {
     useState
 } from "react";
 
+import {
+    useNavigate
+} from "react-router-dom";
+
 import toast from "react-hot-toast";
 
 import StatCard
     from "../components/dashboard/StatCard";
 
+import ExpiringWarrantiesCard
+    from "../components/dashboard/ExpiringWarrantiesCard";
+
 import {
-    getDashboardStats
+    getDashboardStats,
+    getExpiringWarranties
 } from "../services/dashboardService";
 
 function DashboardPage() {
 
+    const navigate =
+        useNavigate();
+
     const [stats, setStats] =
         useState(null);
+
+    const [expiringWarranties, setExpiringWarranties] =
+        useState([]);
 
     const [loading, setLoading] =
         useState(true);
@@ -31,10 +45,15 @@ function DashboardPage() {
 
         try {
 
-            const data =
-                await getDashboardStats();
+            const [statsData, expiringData] =
+                await Promise.all([
+                    getDashboardStats(),
+                    getExpiringWarranties(5)
+                ]);
 
-            setStats(data);
+            setStats(statsData);
+
+            setExpiringWarranties(expiringData);
 
         } catch (error) {
 
@@ -98,6 +117,9 @@ function DashboardPage() {
         }
     ];
 
+    const showAssetsWithWarranty = (warranty) =>
+        navigate(`/assets?warranty=${warranty}`);
+
     return (
         <>
             <Typography
@@ -132,6 +154,94 @@ function DashboardPage() {
                         </Grid>
                     ))
                 }
+            </Grid>
+
+            <Typography
+                variant="h5"
+                fontWeight={600}
+                color="text.primary"
+                sx={{
+                    mt: 5,
+                    mb: 2
+                }}
+            >
+                Warranty
+            </Typography>
+
+            <Grid
+                container
+                spacing={3}
+            >
+                <Grid
+                    size={{
+                        xs: 12,
+                        md: 4
+                    }}
+                >
+                    <Grid
+                        container
+                        spacing={3}
+                    >
+                        <Grid
+                            size={{
+                                xs: 12,
+                                sm: 6,
+                                md: 12
+                            }}
+                        >
+                            <StatCard
+                                title="Expiring Soon"
+                                value={stats.warrantyExpiringAssets}
+                                caption={`Within ${stats.warrantyExpiringWithinDays} days`}
+                                color={
+                                    stats.warrantyExpiringAssets > 0
+                                        ? "warning.main"
+                                        : undefined
+                                }
+                                onClick={() =>
+                                    showAssetsWithWarranty("EXPIRING")
+                                }
+                            />
+                        </Grid>
+
+                        <Grid
+                            size={{
+                                xs: 12,
+                                sm: 6,
+                                md: 12
+                            }}
+                        >
+                            <StatCard
+                                title="Expired"
+                                value={stats.warrantyExpiredAssets}
+                                caption="Assets still in service"
+                                color={
+                                    stats.warrantyExpiredAssets > 0
+                                        ? "error.main"
+                                        : undefined
+                                }
+                                onClick={() =>
+                                    showAssetsWithWarranty("EXPIRED")
+                                }
+                            />
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <Grid
+                    size={{
+                        xs: 12,
+                        md: 8
+                    }}
+                >
+                    <ExpiringWarrantiesCard
+                        assets={expiringWarranties}
+                        windowDays={stats.warrantyExpiringWithinDays}
+                        onViewAll={() =>
+                            showAssetsWithWarranty("EXPIRING")
+                        }
+                    />
+                </Grid>
             </Grid>
         </>
     );

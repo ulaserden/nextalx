@@ -9,6 +9,10 @@ import {
     Typography
 } from "@mui/material";
 
+import {
+    useSearchParams
+} from "react-router-dom";
+
 import toast from "react-hot-toast";
 
 import ListFilterBar
@@ -24,7 +28,8 @@ import useServerList
     from "../hooks/useServerList";
 
 import {
-    ASSET_STATUS_OPTIONS
+    ASSET_STATUS_OPTIONS,
+    WARRANTY_STATUS_OPTIONS
 } from "../constants/filterOptions";
 
 import {
@@ -65,6 +70,40 @@ function AssetsPage() {
     const [categoryOptions, setCategoryOptions] =
         useState([]);
 
+    // The warranty filter lives in the URL (?warranty=EXPIRED) so the
+    // dashboard's warranty cards can link straight to a filtered list.
+    const [searchParams, setSearchParams] =
+        useSearchParams();
+
+    const warrantyParam =
+        searchParams.get("warranty");
+
+    const warrantyFilter =
+        WARRANTY_STATUS_OPTIONS.some(
+            (option) => option.value === warrantyParam
+        )
+            ? warrantyParam
+            : "";
+
+    const setWarrantyFilter = (value) => {
+
+        setSearchParams(
+            (params) => {
+
+                if (value) {
+                    params.set("warranty", value);
+                } else {
+                    params.delete("warranty");
+                }
+
+                return params;
+            },
+            {
+                replace: true
+            }
+        );
+    };
+
     const debouncedSearch =
         useDebouncedValue(search);
 
@@ -76,13 +115,19 @@ function AssetsPage() {
         {
             search: debouncedSearch.trim(),
             status: statusFilter,
-            categoryId: categoryIdFilter
+            categoryId: categoryIdFilter,
+            warranty: warrantyFilter
         },
         "Assets could not be loaded."
     );
 
     const hasActiveFilters =
-        Boolean(search || statusFilter || categoryIdFilter);
+        Boolean(
+            search ||
+            statusFilter ||
+            categoryIdFilter ||
+            warrantyFilter
+        );
 
     const clearFilters = () => {
 
@@ -91,6 +136,8 @@ function AssetsPage() {
         setStatusFilter("");
 
         setCategoryIdFilter("");
+
+        setWarrantyFilter("");
     };
 
     // Options for the category filter dropdown.
@@ -260,6 +307,13 @@ function AssetsPage() {
                     onChange={setCategoryIdFilter}
                     options={categoryOptions}
                     allLabel="All categories"
+                />
+
+                <SelectFilter
+                    label="Warranty"
+                    value={warrantyFilter}
+                    onChange={setWarrantyFilter}
+                    options={WARRANTY_STATUS_OPTIONS}
                 />
             </ListFilterBar>
 

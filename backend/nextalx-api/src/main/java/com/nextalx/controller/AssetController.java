@@ -4,6 +4,7 @@ import com.nextalx.dto.request.CreateAssetRequest;
 import com.nextalx.dto.request.UpdateAssetRequest;
 import com.nextalx.dto.response.AssetResponse;
 import com.nextalx.enums.AssetStatus;
+import com.nextalx.enums.WarrantyStatus;
 import com.nextalx.service.AssetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,12 @@ public class AssetController {
             @RequestParam(
                     required = false
             )
-            Long categoryId
+            Long categoryId,
+
+            @RequestParam(
+                    required = false
+            )
+            WarrantyStatus warranty
     ) {
 
         return assetService.getAllAssets(
@@ -52,7 +58,8 @@ public class AssetController {
                 size,
                 search,
                 status,
-                categoryId
+                categoryId,
+                warranty
         );
     }
 
