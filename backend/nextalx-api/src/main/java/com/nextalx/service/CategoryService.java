@@ -9,7 +9,9 @@ public interface CategoryService {
 
     Page<CategoryResponse> getAllCategories(
             int page,
-            int size
+            int size,
+            String search,
+            String status
     );
 
     CategoryResponse createCategory(

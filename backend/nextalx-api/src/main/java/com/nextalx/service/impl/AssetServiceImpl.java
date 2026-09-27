@@ -14,9 +14,11 @@ import com.nextalx.repository.AssetRepository;
 import com.nextalx.repository.AssignmentRepository;
 import com.nextalx.repository.CategoryRepository;
 import com.nextalx.service.AssetService;
+import com.nextalx.specification.AssetSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,13 +34,18 @@ public class AssetServiceImpl
     @Override
     public Page<AssetResponse> getAllAssets(
             int page,
-            int size
+            int size,
+            String search,
+            AssetStatus status,
+            Long categoryId
     ) {
 
         return assetRepository.findAll(
+                        AssetSpecifications.withFilters(search, status, categoryId),
                         PageRequest.of(
                                 page,
-                                size
+                                size,
+                                Sort.by("id")
                         )
                 )
                 .map(

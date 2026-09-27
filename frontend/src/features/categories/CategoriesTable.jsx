@@ -13,7 +13,11 @@ import BlockIcon from "@mui/icons-material/Block";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 function CategoriesTable({
-    categories,
+    rows,
+    rowCount,
+    loading,
+    paginationModel,
+    onPaginationModelChange,
     onEdit,
     onActivate,
     onDeactivate
@@ -99,22 +103,25 @@ function CategoriesTable({
             }}
         >
             <DataGrid
-                rows={categories}
+                rows={rows}
                 columns={columns}
                 autoHeight
                 disableRowSelectionOnClick
+                paginationMode="server"
+                rowCount={rowCount}
+                loading={loading}
+                paginationModel={paginationModel}
+                onPaginationModelChange={onPaginationModelChange}
                 pageSizeOptions={[
                     5,
                     10,
                     25
                 ]}
-                initialState={{
-                    pagination: {
-                        paginationModel: {
-                            pageSize: 10
-                        }
-                    }
-                }}
+                // Rows are one server page: sorting / filtering them in the
+                // grid would only reorder that page, so it is done via the
+                // filter bar instead.
+                disableColumnSorting
+                disableColumnFilter
             />
         </Paper>
     );

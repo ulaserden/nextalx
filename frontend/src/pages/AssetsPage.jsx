@@ -6,11 +6,30 @@ import {
 import {
     Box,
     Button,
-    Typography,
-    CircularProgress
+    Typography
 } from "@mui/material";
 
 import toast from "react-hot-toast";
+
+import ListFilterBar
+    from "../components/common/ListFilterBar";
+
+import SelectFilter
+    from "../components/common/SelectFilter";
+
+import useDebouncedValue
+    from "../hooks/useDebouncedValue";
+
+import useServerList
+    from "../hooks/useServerList";
+
+import {
+    ASSET_STATUS_OPTIONS
+} from "../constants/filterOptions";
+
+import {
+    getCategories
+} from "../services/categoryService";
 
 import AssetsTable
     from "../features/assets/AssetsTable";
@@ -28,49 +47,69 @@ import {
 
 function AssetsPage() {
 
-    const [assets, setAssets] =
-        useState([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
     const [dialogOpen, setDialogOpen] =
         useState(false);
 
     const [selectedAsset, setSelectedAsset] =
         useState(null);
 
-    const fetchAssets =
-        async () => {
+    const [search, setSearch] =
+        useState("");
 
-            try {
+    const [statusFilter, setStatusFilter] =
+        useState("");
 
-                const response =
-                    await getAssets(
-                        0,
-                        100
-                    );
+    const [categoryIdFilter, setCategoryIdFilter] =
+        useState("");
 
-                setAssets(
-                    response.content
-                );
+    const [categoryOptions, setCategoryOptions] =
+        useState([]);
 
-            } catch (error) {
+    const debouncedSearch =
+        useDebouncedValue(search);
 
-                toast.error(
-                    error?.userMessage ||
-                    "Assets could not be loaded."
-                );
+    const {
+        tableProps,
+        reload
+    } = useServerList(
+        getAssets,
+        {
+            search: debouncedSearch.trim(),
+            status: statusFilter,
+            categoryId: categoryIdFilter
+        },
+        "Assets could not be loaded."
+    );
 
-            } finally {
+    const hasActiveFilters =
+        Boolean(search || statusFilter || categoryIdFilter);
 
-                setLoading(false);
-            }
-        };
+    const clearFilters = () => {
 
+        setSearch("");
+
+        setStatusFilter("");
+
+        setCategoryIdFilter("");
+    };
+
+    // Options for the category filter dropdown.
     useEffect(() => {
 
-        fetchAssets();
+        getCategories({
+            size: 100
+        })
+            .then((data) =>
+                setCategoryOptions(
+                    data.content.map((item) => ({
+                        value: item.id,
+                        label: item.name
+                    }))
+                )
+            )
+            .catch(() => {
+                // the filter just stays empty; the list itself still loads
+            });
 
     }, []);
 
@@ -103,7 +142,7 @@ function AssetsPage() {
 
                 setSelectedAsset(null);
 
-                await fetchAssets();
+                reload();
 
             } catch (error) {
 
@@ -121,7 +160,7 @@ function AssetsPage() {
 
                 await setAssetRepair(asset.id);
 
-                await fetchAssets();
+                reload();
 
                 toast.success(
                     "Asset marked as in repair."
@@ -152,7 +191,7 @@ function AssetsPage() {
 
                 await setAssetRetired(asset.id);
 
-                await fetchAssets();
+                reload();
 
                 toast.success(
                     "Asset retired."
@@ -166,21 +205,6 @@ function AssetsPage() {
                 );
             }
         };
-
-    if (loading) {
-
-        return (
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 5
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
 
     return (
         <Box>
@@ -216,8 +240,31 @@ function AssetsPage() {
                 </Button>
             </Box>
 
+            <ListFilterBar
+                search={search}
+                onSearchChange={setSearch}
+                searchPlaceholder="Search by tag, name, brand, model, serial or supplier"
+                hasActiveFilters={hasActiveFilters}
+                onClear={clearFilters}
+            >
+                <SelectFilter
+                    label="Status"
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={ASSET_STATUS_OPTIONS}
+                />
+
+                <SelectFilter
+                    label="Category"
+                    value={categoryIdFilter}
+                    onChange={setCategoryIdFilter}
+                    options={categoryOptions}
+                    allLabel="All categories"
+                />
+            </ListFilterBar>
+
             <AssetsTable
-                assets={assets}
+                {...tableProps}
                 onEdit={(asset) => {
 
                     setSelectedAsset(asset);

@@ -1,13 +1,26 @@
 import axiosClient from "../api/axiosClient";
 
-export const getEmployees = async (
+// Empty filters are sent as undefined so axios leaves them out of the query.
+export const getEmployees = async ({
     page = 0,
-    size = 10
-) => {
+    size = 10,
+    search,
+    status,
+    departmentId
+} = {}) => {
 
     const response =
         await axiosClient.get(
-            `/employees?page=${page}&size=${size}`
+            "/employees",
+            {
+                params: {
+                    page,
+                    size,
+                    search: search || undefined,
+                    status: status || undefined,
+                    departmentId: departmentId || undefined
+                }
+            }
         );
 
     return response.data;

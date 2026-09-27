@@ -4,11 +4,14 @@ import com.nextalx.entity.Asset;
 import com.nextalx.enums.AssetStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface AssetRepository
-        extends JpaRepository<Asset, Long> {
+        extends JpaRepository<Asset, Long>,
+        JpaSpecificationExecutor<Asset> {
 
     boolean existsByAssetTag(
             String assetTag
@@ -39,6 +42,7 @@ public interface AssetRepository
             }
     )
     Page<Asset> findAll(
+            Specification<Asset> spec,
             Pageable pageable
     );
 }

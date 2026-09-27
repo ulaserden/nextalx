@@ -66,10 +66,9 @@ function AssetDialog({
                 try {
 
                     const response =
-                        await getCategories(
-                            0,
-                            100
-                        );
+                        await getCategories({
+                            size: 100
+                        });
 
                     setCategories(
                         response.content

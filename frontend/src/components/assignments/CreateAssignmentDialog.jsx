@@ -65,28 +65,26 @@ function CreateAssignmentDialog({
 
         try {
 
+            // Only active employees and available assets can take part in
+            // a new assignment, so let the API filter them.
             const employeeResponse =
-                await getEmployees(
-                    0,
-                    100
-                );
+                await getEmployees({
+                    size: 100,
+                    status: "ACTIVE"
+                });
 
             const assetResponse =
-                await getAssets(
-                    0,
-                    100
-                );
+                await getAssets({
+                    size: 100,
+                    status: "AVAILABLE"
+                });
 
             setEmployees(
                 employeeResponse.content
             );
 
             setAssets(
-                assetResponse.content.filter(
-                    asset =>
-                        asset.status ===
-                        "AVAILABLE"
-                )
+                assetResponse.content
             );
 
         } catch (error) {

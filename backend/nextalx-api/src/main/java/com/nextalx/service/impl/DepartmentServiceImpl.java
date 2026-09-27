@@ -9,9 +9,11 @@ import com.nextalx.exception.DepartmentNotFoundException;
 import com.nextalx.mapper.DepartmentMapper;
 import com.nextalx.repository.DepartmentRepository;
 import com.nextalx.service.DepartmentService;
+import com.nextalx.specification.NamedEntitySpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,13 +27,17 @@ public class DepartmentServiceImpl
     @Override
     public Page<DepartmentResponse> getAllDepartments(
             int page,
-            int size
+            int size,
+            String search,
+            String status
     ) {
 
         return departmentRepository.findAll(
+                        NamedEntitySpecifications.withFilters(search, status),
                         PageRequest.of(
                                 page,
-                                size
+                                size,
+                                Sort.by("id")
                         )
                 )
                 .map(

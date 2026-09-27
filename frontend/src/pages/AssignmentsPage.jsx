@@ -1,16 +1,30 @@
 import {
-    useEffect,
     useState
 } from "react";
 
 import {
     Box,
     Button,
-    CircularProgress,
     Typography
 } from "@mui/material";
 
 import toast from "react-hot-toast";
+
+import ListFilterBar
+    from "../components/common/ListFilterBar";
+
+import SelectFilter
+    from "../components/common/SelectFilter";
+
+import useDebouncedValue
+    from "../hooks/useDebouncedValue";
+
+import useServerList
+    from "../hooks/useServerList";
+
+import {
+    ASSIGNMENT_STATUS_OPTIONS
+} from "../constants/filterOptions";
 
 import AssignmentTable
     from "../components/assignments/AssignmentTable";
@@ -26,48 +40,39 @@ import {
 
 function AssignmentsPage() {
 
-    const [assignments, setAssignments] =
-        useState([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
     const [openDialog, setOpenDialog] =
         useState(false);
 
-    const loadAssignments =
-        async () => {
+    const [search, setSearch] =
+        useState("");
 
-            try {
+    const [statusFilter, setStatusFilter] =
+        useState("");
 
-                const data =
-                    await getAssignments(
-                        0,
-                        100
-                    );
+    const debouncedSearch =
+        useDebouncedValue(search);
 
-                setAssignments(
-                    data.content
-                );
+    const {
+        tableProps,
+        reload
+    } = useServerList(
+        getAssignments,
+        {
+            search: debouncedSearch.trim(),
+            status: statusFilter
+        },
+        "Assignments could not be loaded."
+    );
 
-            } catch (error) {
+    const hasActiveFilters =
+        Boolean(search || statusFilter);
 
-                toast.error(
-                    error?.userMessage ||
-                    "Assignments could not be loaded."
-                );
+    const clearFilters = () => {
 
-            } finally {
+        setSearch("");
 
-                setLoading(false);
-            }
-        };
-
-    useEffect(() => {
-
-        loadAssignments();
-
-    }, []);
+        setStatusFilter("");
+    };
 
     const handleCreate =
         async (assignmentData) => {
@@ -80,7 +85,7 @@ function AssignmentsPage() {
 
                 setOpenDialog(false);
 
-                await loadAssignments();
+                reload();
 
                 toast.success(
                     "Asset assigned successfully."
@@ -111,7 +116,7 @@ function AssignmentsPage() {
 
                 await returnAssignment(id);
 
-                await loadAssignments();
+                reload();
 
                 toast.success(
                     "Asset returned successfully."
@@ -125,21 +130,6 @@ function AssignmentsPage() {
                 );
             }
         };
-
-    if (loading) {
-
-        return (
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 5
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
 
     return (
         <Box>
@@ -172,8 +162,23 @@ function AssignmentsPage() {
                 </Button>
             </Box>
 
+            <ListFilterBar
+                search={search}
+                onSearchChange={setSearch}
+                searchPlaceholder="Search by employee, email, asset tag, name or serial"
+                hasActiveFilters={hasActiveFilters}
+                onClear={clearFilters}
+            >
+                <SelectFilter
+                    label="Status"
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={ASSIGNMENT_STATUS_OPTIONS}
+                />
+            </ListFilterBar>
+
             <AssignmentTable
-                assignments={assignments}
+                {...tableProps}
                 onReturn={handleReturn}
             />
 

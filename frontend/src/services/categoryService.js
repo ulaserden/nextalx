@@ -1,13 +1,24 @@
 import axiosClient from "../api/axiosClient";
 
-export const getCategories = async (
+// Empty filters are sent as undefined so axios leaves them out of the query.
+export const getCategories = async ({
     page = 0,
-    size = 10
-) => {
+    size = 10,
+    search,
+    status
+} = {}) => {
 
     const response =
         await axiosClient.get(
-            `/categories?page=${page}&size=${size}`
+            "/categories",
+            {
+                params: {
+                    page,
+                    size,
+                    search: search || undefined,
+                    status: status || undefined
+                }
+            }
         );
 
     return response.data;

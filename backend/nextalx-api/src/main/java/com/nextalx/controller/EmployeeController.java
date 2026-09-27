@@ -28,13 +28,30 @@ public class EmployeeController {
             @RequestParam(
                     defaultValue = "10"
             )
-            int size
+            int size,
 
+            @RequestParam(
+                    required = false
+            )
+            String search,
+
+            @RequestParam(
+                    required = false
+            )
+            String status,
+
+            @RequestParam(
+                    required = false
+            )
+            Long departmentId
     ) {
 
         return employeeService.getAllEmployees(
                 page,
-                size
+                size,
+                search,
+                status,
+                departmentId
         );
     }
 

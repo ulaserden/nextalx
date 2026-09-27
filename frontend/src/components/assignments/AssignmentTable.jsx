@@ -1,114 +1,106 @@
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    Button
+    DataGrid
+} from "@mui/x-data-grid";
+
+import {
+    Button,
+    Paper
 } from "@mui/material";
 
 function AssignmentTable({
-    assignments,
+    rows,
+    rowCount,
+    loading,
+    paginationModel,
+    onPaginationModelChange,
     onReturn
 }) {
 
+    const columns = [
+        {
+            field: "employeeName",
+            headerName: "Employee",
+            flex: 1.3
+        },
+        {
+            field: "assetTag",
+            headerName: "Asset",
+            flex: 1
+        },
+        {
+            field: "assignedDate",
+            headerName: "Assigned Date",
+            flex: 1
+        },
+        {
+            field: "expectedReturnDate",
+            headerName: "Expected Return",
+            flex: 1
+        },
+        {
+            field: "returnedDate",
+            headerName: "Returned Date",
+            flex: 1
+        },
+        {
+            field: "status",
+            headerName: "Status",
+            flex: 0.8
+        },
+        {
+            field: "actions",
+            headerName: "Action",
+            width: 120,
+            renderCell: (params) => (
+
+                params.row.status ===
+                "ACTIVE" && (
+                    <Button
+                        variant="contained"
+                        color="success"
+                        size="small"
+                        onClick={() =>
+                            onReturn(
+                                params.row.id
+                            )
+                        }
+                    >
+                        Return
+                    </Button>
+                )
+            )
+        }
+    ];
+
     return (
-        <TableContainer
-            component={Paper}
+        <Paper
+            elevation={3}
+            sx={{
+                width: "100%"
+            }}
         >
-            <Table>
-
-                <TableHead>
-                    <TableRow>
-
-                        <TableCell>
-                            Employee
-                        </TableCell>
-
-                        <TableCell>
-                            Asset
-                        </TableCell>
-
-                        <TableCell>
-                            Assigned Date
-                        </TableCell>
-
-                        <TableCell>
-                            Status
-                        </TableCell>
-
-                        <TableCell>
-                            Action
-                        </TableCell>
-
-                    </TableRow>
-                </TableHead>
-
-                <TableBody>
-
-                    {assignments.map(
-                        (assignment) => (
-                            <TableRow
-                                key={
-                                    assignment.id
-                                }
-                            >
-
-                                <TableCell>
-                                    {
-                                        assignment.employeeName
-                                    }
-                                </TableCell>
-
-                                <TableCell>
-                                    {
-                                        assignment.assetTag
-                                    }
-                                </TableCell>
-
-                                <TableCell>
-                                    {
-                                        assignment.assignedDate
-                                    }
-                                </TableCell>
-
-                                <TableCell>
-                                    {
-                                        assignment.status
-                                    }
-                                </TableCell>
-
-                                <TableCell>
-
-                                    {
-                                        assignment.status ===
-                                        "ACTIVE" && (
-                                            <Button
-                                                variant="contained"
-                                                color="success"
-                                                onClick={() =>
-                                                    onReturn(
-                                                        assignment.id
-                                                    )
-                                                }
-                                            >
-                                                Return
-                                            </Button>
-                                        )
-                                    }
-
-                                </TableCell>
-
-                            </TableRow>
-                        )
-                    )}
-
-                </TableBody>
-
-            </Table>
-        </TableContainer>
+            <DataGrid
+                rows={rows}
+                columns={columns}
+                autoHeight
+                disableRowSelectionOnClick
+                paginationMode="server"
+                rowCount={rowCount}
+                loading={loading}
+                paginationModel={paginationModel}
+                onPaginationModelChange={onPaginationModelChange}
+                pageSizeOptions={[
+                    5,
+                    10,
+                    25
+                ]}
+                // Rows are one server page: sorting / filtering them in the
+                // grid would only reorder that page, so it is done via the
+                // filter bar instead.
+                disableColumnSorting
+                disableColumnFilter
+            />
+        </Paper>
     );
 }
 

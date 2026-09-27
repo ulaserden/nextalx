@@ -1,16 +1,30 @@
 import {
-    useEffect,
     useState
 } from "react";
 
 import {
     Box,
     Button,
-    CircularProgress,
     Typography
 } from "@mui/material";
 
 import toast from "react-hot-toast";
+
+import ListFilterBar
+    from "../components/common/ListFilterBar";
+
+import SelectFilter
+    from "../components/common/SelectFilter";
+
+import useDebouncedValue
+    from "../hooks/useDebouncedValue";
+
+import useServerList
+    from "../hooks/useServerList";
+
+import {
+    ACTIVE_STATUS_OPTIONS
+} from "../constants/filterOptions";
 
 import DepartmentsTable
     from "../features/departments/DepartmentsTable";
@@ -28,12 +42,6 @@ import {
 
 function DepartmentsPage() {
 
-    const [departments, setDepartments] =
-        useState([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
     const [dialogOpen, setDialogOpen] =
         useState(false);
 
@@ -41,39 +49,36 @@ function DepartmentsPage() {
         setSelectedDepartment] =
         useState(null);
 
-    const fetchDepartments =
-        async () => {
+    const [search, setSearch] =
+        useState("");
 
-            try {
+    const [statusFilter, setStatusFilter] =
+        useState("");
 
-                const response =
-                    await getDepartments(
-                        0,
-                        100
-                    );
+    const debouncedSearch =
+        useDebouncedValue(search);
 
-                setDepartments(
-                    response.content
-                );
+    const {
+        tableProps,
+        reload
+    } = useServerList(
+        getDepartments,
+        {
+            search: debouncedSearch.trim(),
+            status: statusFilter
+        },
+        "Departments could not be loaded."
+    );
 
-            } catch (error) {
+    const hasActiveFilters =
+        Boolean(search || statusFilter);
 
-                toast.error(
-                    error?.userMessage ||
-                    "Departments could not be loaded."
-                );
+    const clearFilters = () => {
 
-            } finally {
+        setSearch("");
 
-                setLoading(false);
-            }
-        };
-
-    useEffect(() => {
-
-        fetchDepartments();
-
-    }, []);
+        setStatusFilter("");
+    };
 
     const handleCreateDepartment =
         async (departmentData) => {
@@ -86,7 +91,7 @@ function DepartmentsPage() {
 
                 setDialogOpen(false);
 
-                await fetchDepartments();
+                reload();
 
                 toast.success(
                     "Department created successfully."
@@ -115,7 +120,7 @@ function DepartmentsPage() {
 
                 setSelectedDepartment(null);
 
-                await fetchDepartments();
+                reload();
 
                 toast.success(
                     "Department updated successfully."
@@ -148,7 +153,7 @@ function DepartmentsPage() {
                     department.id
                 );
 
-                await fetchDepartments();
+                reload();
 
                 toast.success(
                     "Department deactivated successfully."
@@ -172,7 +177,7 @@ function DepartmentsPage() {
                     department.id
                 );
 
-                await fetchDepartments();
+                reload();
 
                 toast.success(
                     "Department activated successfully."
@@ -186,21 +191,6 @@ function DepartmentsPage() {
                 );
             }
         };
-
-    if (loading) {
-
-        return (
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 5
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
 
     return (
         <Box>
@@ -236,8 +226,23 @@ function DepartmentsPage() {
                 </Button>
             </Box>
 
+            <ListFilterBar
+                search={search}
+                onSearchChange={setSearch}
+                searchPlaceholder="Search by name or description"
+                hasActiveFilters={hasActiveFilters}
+                onClear={clearFilters}
+            >
+                <SelectFilter
+                    label="Status"
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={ACTIVE_STATUS_OPTIONS}
+                />
+            </ListFilterBar>
+
             <DepartmentsTable
-                departments={departments}
+                {...tableProps}
                 onEdit={(department) => {
 
                     setSelectedDepartment(department);
